@@ -258,8 +258,12 @@ if (reduced) {
     document.body.appendChild(rail);
     const links = qa("a", rail);
     const io = new IntersectionObserver((es) => es.forEach((en) => {
-      if (en.isIntersecting) links.forEach((l) =>
-        l.classList.toggle("on", l.getAttribute("href") === "#" + en.target.id));
+      if (en.isIntersecting) links.forEach((l) => {
+        const on = l.getAttribute("href") === "#" + en.target.id;
+        l.classList.toggle("on", on);
+        if (on) l.setAttribute("aria-current", "true");
+        else l.removeAttribute("aria-current");
+      });
     }), { rootMargin: "-40% 0px -55% 0px" });
     secs.forEach((s) => io.observe(s));
     /* ヒーローを抜けたら現れる（縦書きの.tateと重ならないように） */
@@ -267,6 +271,29 @@ if (reduced) {
     if (hero) new IntersectionObserver((es) => es.forEach((en) =>
       rail.classList.toggle("show", !en.isIntersecting)), { threshold: 0.2 }).observe(hero);
     else rail.classList.add("show");
+  });
+
+  /* ---- モバイル固定CTAバー（ヒーロー通過後に出現） ---- */
+  safe(() => {
+    const hero = q(".hero");
+    const mail = q('.hero-ctas .btn-fill');
+    const line = q('.hero-ctas .btn-line');
+    if (!hero || !mail) return;
+    const bar = document.createElement("div");
+    bar.className = "mx-cta-bar";
+    const mk = (src, cls) => {
+      const a = document.createElement("a");
+      a.className = "btn " + cls;
+      a.href = src.getAttribute("href");
+      if (src.target) { a.target = src.target; a.rel = src.rel; }
+      a.innerHTML = src.innerHTML;
+      return a;
+    };
+    bar.appendChild(mk(mail, "btn-fill"));
+    if (line) bar.appendChild(mk(line, "btn-line"));
+    document.body.appendChild(bar);
+    new IntersectionObserver((es) => es.forEach((en) =>
+      bar.classList.toggle("show", !en.isIntersecting)), { threshold: 0.15 }).observe(hero);
   });
 
   /* ---- シグネチャーバンド：パララックス＋コピー登場 ---- */
