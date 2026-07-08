@@ -305,6 +305,15 @@ if (reduced) {
         scroll(animate(img, { y: ["-7%", "7%"] }, { easing: "linear" }),
           { target: band, offset: ["start end", "end start"] });
       }
+      /* 実写ループ動画（あれば）：視界に入ったら再生、外れたら停止 */
+      const video = band.querySelector("video");
+      if (video) {
+        video.addEventListener("error", () => video.remove());
+        inView(band, () => {
+          video.play().catch(() => video.remove());
+          return () => video.pause();
+        }, { amount: 0.2 });
+      }
       const texts = qa(".mx-band-en, .mx-band-jp", band);
       texts.forEach((t) => (t.style.opacity = "0"));
       inView(band, () => {

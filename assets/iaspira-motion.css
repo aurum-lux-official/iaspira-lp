@@ -90,6 +90,16 @@ html.mx .nav.mx-hide { transform: translateY(-100%); }
   position: absolute; top: -9%; left: 0; width: 100%; height: 118%;
   object-fit: cover; will-change: transform;
 }
+/* 動画バンド（実写ループ）。imgはポスター兼フォールバックとして下に残す。
+   元動画は縦コンテンツが16:9キャンバスに黒帯付きで焼き込まれているため、
+   scaleで内側の映像柱（幅約41%）を全幅まで拡大してトリミングする。
+   これでウォーターマーク（元映像の最上部）もフレーム外に出る */
+.mx-band > video {
+  position: absolute; top: -9%; left: 0; width: 100%; height: 118%;
+  object-fit: cover;
+  transform: scale(2.45); transform-origin: 50% 52%;
+}
+html.mx-r .mx-band > video { display: none; }
 .mx-band::after {
   content: ""; position: absolute; inset: 0; pointer-events: none;
   background:
