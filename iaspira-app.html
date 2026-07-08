@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IASPIRA｜そのアイデアを、価値あるアプリに。</title>
+  <meta name="description" content="企画・要件定義からUI/UXデザイン、開発、リリース後の運用・改善まで。AIも活用し、成果につながるアプリを一気通貫で開発します。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Shippori+Mincho:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a12;
+      --bg-2: #100f1c;
+      --ink: #f2f1f7;
+      --sub: #b9b6c8;
+      --faint: #817d94;
+      --line: rgb(242 241 247 / 10%);
+      --line-strong: rgb(242 241 247 / 18%);
+      --glass: rgb(255 255 255 / 3.5%);
+      --glass-2: rgb(255 255 255 / 6%);
+      --acc: #9d8cff;
+      --acc-deep: #5a7bff;
+      --acc2: #c9beff;
+      --acc-dim: rgb(157 140 255 / 45%);
+      --grad-acc: linear-gradient(115deg, #b9aaff, #5a7bff);
+      --display: "Cormorant Garamond", "Shippori Mincho", serif;
+      --mincho: "Shippori Mincho", ui-serif, serif;
+      --gothic: "Zen Kaku Gothic New", "Hiragino Sans", sans-serif;
+      --max: 1180px;
+      --r: 4px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; background: var(--bg); color: var(--ink);
+      font-family: var(--gothic); font-size: 16px; line-height: 1.95;
+      letter-spacing: .02em; -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility; overflow-x: hidden;
+    }
+    ::selection { background: rgb(157 140 255 / 28%); }
+    a { color: inherit; text-decoration: none; }
+    a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--acc); outline-offset: 3px; border-radius: var(--r); }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+      .rv { opacity: 1 !important; transform: none !important; }
+    }
+    .wrap { width: min(var(--max), calc(100% - 48px)); margin: 0 auto; }
+
+    .atmosphere {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 70rem 44rem at 78% -8%, rgb(157 140 255 / 12%), transparent 60%),
+        radial-gradient(ellipse 56rem 40rem at 6% 34%, rgb(90 123 255 / 8%), transparent 62%),
+        radial-gradient(ellipse 60rem 50rem at 90% 96%, rgb(201 190 255 / 6%), transparent 60%);
+    }
+    .atmosphere::after {
+      content: ""; position: absolute; inset: 0; opacity: .5;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    main, header.nav, footer { position: relative; z-index: 1; }
+
+    .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 50; border-bottom: 1px solid transparent; transition: background .4s ease, border-color .4s ease; }
+    .nav.scrolled { background: rgb(10 10 18 / 78%); backdrop-filter: blur(18px) saturate(1.1); border-bottom-color: var(--line); }
+    .nav-in { display: flex; align-items: center; gap: 28px; height: 78px; }
+    .brand { display: flex; align-items: baseline; gap: 14px; margin-right: auto; }
+    .brand .mark { font-family: var(--display); font-weight: 500; font-size: 24px; letter-spacing: .3em; color: var(--ink); }
+    .brand .sub { font-size: 10px; letter-spacing: .32em; color: var(--acc-dim); text-transform: uppercase; }
+    .nav-links { display: flex; gap: 30px; font-size: 13px; letter-spacing: .08em; }
+    .nav-links a { color: var(--sub); transition: color .3s; position: relative; padding: 4px 0; }
+    .nav-links a::after { content: ""; position: absolute; left: 0; bottom: 0; width: 0; height: 1px; background: var(--acc); transition: width .35s ease; }
+    .nav-links a:hover { color: var(--ink); }
+    .nav-links a:hover::after { width: 100%; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 14px 30px; border-radius: 999px; font-size: 14px; font-weight: 500;
+      letter-spacing: .1em; cursor: pointer; transition: all .35s ease;
+      border: 1px solid var(--line-strong); position: relative; overflow: hidden;
+      white-space: nowrap;
+    }
+    .btn-fill { background: var(--grad-acc); color: #0d0a1f; border-color: transparent; font-weight: 700; box-shadow: 0 8px 32px rgb(157 140 255 / 22%); }
+    .btn-fill:hover { transform: translateY(-2px); box-shadow: 0 14px 44px rgb(157 140 255 / 34%); }
+    .btn-ghost { color: var(--ink); background: rgb(255 255 255 / 3%); }
+    .btn-ghost:hover { border-color: var(--acc-dim); background: rgb(255 255 255 / 6%); transform: translateY(-2px); }
+    .btn-line { color: #9fe8b8; border-color: rgb(6 199 85 / 40%); background: rgb(6 199 85 / 7%); }
+    .btn-line:hover { background: rgb(6 199 85 / 14%); transform: translateY(-2px); }
+    .btn-nav { padding: 11px 24px; font-size: 12.5px; }
+    @media (max-width: 900px) { .nav-links { display: none; } }
+    @media (max-width: 620px) {
+      .brand .sub { display: none; }
+      .btn-nav { padding: 10px 16px; font-size: 11.5px; letter-spacing: .06em; }
+    }
+
+    .hero { position: relative; min-height: 100svh; display: flex; align-items: center; padding: 130px 0 80px; }
+    #device3d { position: absolute; top: 0; right: -4%; width: 58%; height: 100%; z-index: 0; }
+    #device3d canvas { display: block; }
+    .hero-glow { position: absolute; top: 30%; right: 14%; width: 30rem; height: 30rem; background: radial-gradient(circle, rgb(157 140 255 / 13%), transparent 65%); filter: blur(10px); pointer-events: none; }
+    .hero-in { position: relative; z-index: 2; max-width: 700px; }
+    .hero-eyebrow {
+      display: flex; align-items: center; gap: 16px;
+      font-family: var(--display); font-style: italic; font-size: 15px;
+      letter-spacing: .42em; color: var(--acc); text-transform: uppercase; margin-bottom: 34px;
+    }
+    .hero-eyebrow::before { content: ""; width: 56px; height: 1px; background: var(--acc-dim); }
+    h1 { font-family: var(--mincho); font-weight: 600; font-size: clamp(31px, 4.1vw, 54px); line-height: 1.55; letter-spacing: .055em; margin: 0 0 30px; }
+    h1 .accent { background: var(--grad-acc); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .hero-lead { color: var(--sub); font-size: 16.5px; line-height: 2.15; margin: 0 0 44px; max-width: 33em; }
+    .hero-ctas { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 52px; }
+    .hero-chips { display: flex; flex-wrap: wrap; gap: 10px 26px; }
+    .chip { display: inline-flex; align-items: center; gap: 9px; font-size: 12.5px; letter-spacing: .1em; color: var(--sub); }
+    .chip svg { width: 15px; height: 15px; stroke: var(--acc); flex: none; }
+    .tate {
+      position: absolute; right: 38px; top: 50%; transform: translateY(-50%);
+      writing-mode: vertical-rl; z-index: 3;
+      font-family: var(--mincho); font-size: 13px; letter-spacing: .6em; color: var(--faint);
+      border-right: 1px solid var(--line); padding-right: 18px;
+    }
+    .scroll-cue {
+      position: absolute; bottom: 38px; left: 50%; transform: translateX(-50%);
+      font-size: 10px; letter-spacing: .4em; color: var(--faint); z-index: 3;
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+    }
+    .scroll-cue::after { content: ""; width: 1px; height: 46px; background: linear-gradient(180deg, var(--acc-dim), transparent); animation: cue 2.4s ease infinite; }
+    @keyframes cue { 0% { transform: scaleY(0); transform-origin: top; } 55% { transform: scaleY(1); transform-origin: top; } 56% { transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
+    @media (max-height: 880px) { .scroll-cue { display: none; } }
+    @media (max-width: 900px) {
+      #device3d { right: -22%; width: 100%; opacity: .5; }
+      .tate { display: none; }
+      .hero-in { max-width: 100%; }
+    }
+
+    section { padding: 110px 0; position: relative; }
+    .sec-head { margin-bottom: 64px; }
+    .sec-eyebrow {
+      display: flex; align-items: center; gap: 16px;
+      font-family: var(--display); font-style: italic; font-size: 13px;
+      letter-spacing: .42em; color: var(--acc); text-transform: uppercase; margin-bottom: 22px;
+    }
+    .sec-eyebrow .num { font-style: normal; color: var(--faint); letter-spacing: .2em; }
+    .sec-eyebrow::after { content: ""; flex: 1; max-width: 120px; height: 1px; background: var(--line-strong); }
+    h2 { font-family: var(--mincho); font-weight: 600; font-size: clamp(26px, 3.4vw, 40px); line-height: 1.6; letter-spacing: .05em; margin: 0; }
+    .sec-note { color: var(--faint); font-size: 12.5px; margin-top: 28px; }
+    .rv { opacity: 0; transform: translateY(28px); transition: opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1); }
+    .rv.in { opacity: 1; transform: none; }
+
+    .stats { padding: 0; }
+    .stats-in { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .stat { padding: 44px 20px; text-align: center; border-left: 1px solid var(--line); }
+    .stat:first-child { border-left: 0; }
+    .stat .num {
+      font-family: var(--display); font-weight: 500; font-size: clamp(38px, 4.6vw, 58px); line-height: 1.1;
+      background: linear-gradient(160deg, var(--ink) 30%, var(--acc));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .stat .num small { font-size: .45em; letter-spacing: .06em; }
+    .stat .label { font-size: 12px; letter-spacing: .22em; color: var(--faint); margin-top: 10px; }
+    @media (max-width: 760px) {
+      .stats-in { grid-template-columns: 1fr 1fr; }
+      .stat:nth-child(3) { border-left: 0; }
+      .stat:nth-child(n+3) { border-top: 1px solid var(--line); }
+    }
+
+    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+    .feature { background: var(--bg); padding: 52px 38px 48px; position: relative; transition: background .5s ease; }
+    .feature:hover { background: var(--bg-2); }
+    .feature .f-num { font-family: var(--display); font-style: italic; font-size: 15px; color: var(--acc-dim); letter-spacing: .2em; margin-bottom: 26px; }
+    .feature .f-visual { height: 96px; margin-bottom: 30px; display: flex; align-items: center; }
+    .feature .f-visual svg { height: 84px; width: auto; }
+    .feature h3 { font-family: var(--mincho); font-size: 20px; font-weight: 600; letter-spacing: .06em; margin: 0 0 14px; }
+    .feature p { color: var(--sub); font-size: 14.5px; margin: 0; }
+    .feature .f-tag { position: absolute; top: 50px; right: 34px; font-family: var(--display); font-style: italic; font-size: 12px; letter-spacing: .3em; color: var(--faint); text-transform: uppercase; }
+    @media (max-width: 900px) { .features-grid { grid-template-columns: 1fr; } }
+
+    .process-list { display: grid; gap: 0; border-top: 1px solid var(--line); }
+    .step {
+      display: grid; grid-template-columns: 130px 280px 1fr; gap: 28px;
+      align-items: baseline; padding: 40px 8px; border-bottom: 1px solid var(--line);
+      transition: background .4s ease, padding-left .4s ease;
+    }
+    .step:hover { background: rgb(255 255 255 / 2%); padding-left: 20px; }
+    .step .s-num { font-family: var(--display); font-style: italic; font-weight: 400; font-size: 42px; color: var(--acc-dim); line-height: 1; }
+    .step h3 { font-family: var(--mincho); font-size: 21px; font-weight: 600; letter-spacing: .08em; margin: 0; }
+    .step p { color: var(--sub); font-size: 14.5px; margin: 0; }
+    @media (max-width: 820px) {
+      .step { grid-template-columns: 64px 1fr; }
+      .step p { grid-column: 2; }
+    }
+
+    .price-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; align-items: stretch; }
+    .plan {
+      border: 1px solid var(--line); background: var(--glass); padding: 46px 36px 40px;
+      position: relative; display: flex; flex-direction: column;
+      transition: transform .4s ease, border-color .4s ease, background .4s ease;
+    }
+    .plan:hover { transform: translateY(-6px); border-color: var(--line-strong); background: var(--glass-2); }
+    .plan.featured { border-color: var(--acc-dim); background: linear-gradient(180deg, rgb(157 140 255 / 7%), rgb(255 255 255 / 3%)); }
+    .plan .badge {
+      position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+      font-size: 11px; letter-spacing: .26em; padding: 6px 18px;
+      background: var(--acc); color: #0d0a1f; border-radius: 999px; font-weight: 700; white-space: nowrap;
+    }
+    .plan h3 { font-family: var(--mincho); font-size: 19px; font-weight: 600; letter-spacing: .14em; margin: 0 0 22px; }
+    .plan .price { font-family: var(--display); font-weight: 500; font-size: 44px; line-height: 1.1; margin-bottom: 6px; }
+    .plan .price small { font-size: .42em; color: var(--sub); letter-spacing: .1em; }
+    .plan .p-sub { font-size: 12px; color: var(--faint); letter-spacing: .14em; margin-bottom: 30px; }
+    .plan ul { list-style: none; margin: 0 0 36px; padding: 0; display: grid; gap: 13px; flex: 1; }
+    .plan li { display: flex; gap: 12px; align-items: flex-start; font-size: 14px; color: var(--sub); }
+    .plan li::before { content: ""; flex: none; width: 6px; height: 6px; margin-top: 11px; background: var(--acc); transform: rotate(45deg); }
+    .plan .btn { width: 100%; }
+    @media (max-width: 900px) { .price-grid { grid-template-columns: 1fr; } }
+
+    .works-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+    .work { border: 1px solid var(--line); background: var(--glass); overflow: hidden; transition: transform .4s ease, border-color .4s ease; }
+    .work:hover { transform: translateY(-6px); border-color: var(--acc-dim); }
+    .work .w-visual {
+      height: 210px; display: flex; align-items: center; justify-content: center;
+      background:
+        radial-gradient(circle at 50% 64%, rgb(157 140 255 / 13%), transparent 62%),
+        linear-gradient(180deg, var(--bg-2), #14112a);
+      border-bottom: 1px solid var(--line);
+    }
+    .work .w-visual svg { height: 130px; }
+    .work .w-body { padding: 28px 28px 30px; }
+    .work .w-cat { font-family: var(--display); font-style: italic; font-size: 12px; letter-spacing: .3em; color: var(--acc); text-transform: uppercase; margin-bottom: 10px; }
+    .work h3 { font-family: var(--mincho); font-size: 18px; font-weight: 600; letter-spacing: .05em; margin: 0 0 12px; }
+    .work p { font-size: 13.5px; color: var(--sub); margin: 0 0 18px; }
+    .work .w-kpi { display: flex; gap: 18px; border-top: 1px solid var(--line); padding-top: 16px; }
+    .work .w-kpi div { font-size: 11px; color: var(--faint); letter-spacing: .1em; }
+    .work .w-kpi b { display: block; font-family: var(--display); font-size: 22px; font-weight: 500; color: var(--ink); letter-spacing: .04em; }
+    @media (max-width: 900px) { .works-grid { grid-template-columns: 1fr; } }
+
+    .voice-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+    .voice { border: 1px solid var(--line); background: var(--glass); padding: 38px 32px; display: flex; flex-direction: column; gap: 18px; transition: border-color .4s ease; }
+    .voice:hover { border-color: var(--line-strong); }
+    .voice .v-mark { font-family: var(--display); font-style: italic; font-size: 54px; line-height: .6; color: var(--acc-dim); }
+    .voice p { margin: 0; font-size: 14px; color: var(--sub); flex: 1; }
+    .voice .v-stars { display: flex; gap: 4px; }
+    .voice .v-stars svg { width: 14px; height: 14px; fill: var(--acc); }
+    .voice .v-who { font-size: 12px; letter-spacing: .12em; color: var(--faint); border-top: 1px solid var(--line); padding-top: 16px; }
+    .voice .v-who b { color: var(--ink); font-weight: 500; display: block; font-size: 13px; margin-bottom: 2px; }
+    @media (max-width: 900px) { .voice-grid { grid-template-columns: 1fr; } }
+
+    .cta { padding: 130px 0; }
+    .cta-in {
+      border: 1px solid var(--acc-dim); position: relative;
+      padding: 90px 40px; text-align: center; overflow: hidden;
+      background:
+        radial-gradient(ellipse 40rem 22rem at 50% 120%, rgb(157 140 255 / 13%), transparent 65%),
+        var(--glass);
+    }
+    .cta-in::before, .cta-in::after { content: ""; position: absolute; width: 56px; height: 56px; pointer-events: none; }
+    .cta-in::before { top: 14px; left: 14px; border-top: 1px solid var(--acc); border-left: 1px solid var(--acc); }
+    .cta-in::after { bottom: 14px; right: 14px; border-bottom: 1px solid var(--acc); border-right: 1px solid var(--acc); }
+    .cta h2 { margin-bottom: 24px; }
+    .cta p { color: var(--sub); max-width: 36em; margin: 0 auto 44px; }
+    .cta .hero-ctas { justify-content: center; margin-bottom: 36px; }
+    .cta-chips { display: flex; flex-wrap: wrap; gap: 10px 28px; justify-content: center; font-size: 12px; letter-spacing: .18em; color: var(--faint); }
+    .cta-chips span::before { content: "◇ "; color: var(--acc); }
+
+    .faq-list { max-width: 860px; border-top: 1px solid var(--line); }
+    details { border-bottom: 1px solid var(--line); }
+    summary {
+      list-style: none; cursor: pointer; display: flex; align-items: baseline; gap: 22px;
+      padding: 28px 8px; font-family: var(--mincho); font-size: 16.5px; font-weight: 500;
+      letter-spacing: .04em; transition: color .3s;
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary:hover { color: var(--acc); }
+    summary .q { font-family: var(--display); font-style: italic; color: var(--acc); font-size: 18px; flex: none; }
+    summary .plus { margin-left: auto; flex: none; width: 14px; height: 14px; position: relative; align-self: center; }
+    summary .plus::before, summary .plus::after { content: ""; position: absolute; background: var(--acc); transition: transform .35s ease; }
+    summary .plus::before { left: 0; top: 6px; width: 14px; height: 1px; }
+    summary .plus::after { left: 6.5px; top: 0; width: 1px; height: 14px; }
+    details[open] summary .plus::after { transform: scaleY(0); }
+    details .a { padding: 0 8px 30px 52px; color: var(--sub); font-size: 14.5px; max-width: 46em; }
+
+    footer { border-top: 1px solid var(--line); padding: 80px 0 46px; overflow: hidden; }
+    .foot-word {
+      font-family: var(--display); font-weight: 400; letter-spacing: .22em;
+      font-size: clamp(60px, 11vw, 150px); line-height: 1; text-align: center;
+      color: transparent; -webkit-text-stroke: 1px rgb(242 241 247 / 13%);
+      user-select: none; margin-bottom: 60px;
+    }
+    .foot-in { display: flex; flex-wrap: wrap; gap: 28px; align-items: center; justify-content: space-between; }
+    .foot-links { display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 12px; color: var(--faint); }
+    .foot-links a:hover { color: var(--acc); }
+    .copy { font-size: 11px; letter-spacing: .2em; color: var(--faint); }
+  </style>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 3h12l4 6-10 12L2 9l4-6z' fill='%23d9bd8e'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./assets/iaspira-motion.css?v=20260707h">
+</head>
+<body>
+  <script>(function(){var d=document,c=d.documentElement.classList;if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;c.add("mx-pre");setTimeout(function(){c.remove("mx-pre")},1400);var seen=null;try{seen=sessionStorage.getItem("mxIntro");sessionStorage.setItem("mxIntro","1")}catch(e){}if(!seen){var o=d.createElement("div");o.className="mx-intro";o.innerHTML='<span class="w">IASPIRA</span>';d.body.appendChild(o);o.addEventListener("animationend",function(e){if(e.animationName==="mx-intro-leave")o.remove()});setTimeout(function(){o.parentNode&&o.remove()},3400);}})();</script>
+  <div class="atmosphere" aria-hidden="true"></div>
+
+  <header class="nav" id="nav">
+    <div class="wrap nav-in">
+      <a class="brand" href="./index.html">
+        <span class="mark">IASPIRA</span>
+        <span class="sub">App Development</span>
+      </a>
+      <nav class="nav-links" aria-label="ページ内ナビゲーション">
+        <a href="#features">特徴</a>
+        <a href="#process">開発の流れ</a>
+        <a href="#price">料金の目安</a>
+        <a href="#works">導入事例</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <a class="btn btn-fill btn-nav" href="mailto:iaspira@goatmail.uk?subject=【アプリ開発】無料相談">無料で相談する</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- ===== HERO ===== -->
+    <section class="hero" id="top">
+      <div id="device3d" aria-hidden="true"><div class="hero-glow"></div></div>
+      <div class="wrap">
+        <div class="hero-in">
+          <p class="hero-eyebrow">IASPIRA — App Development</p>
+          <h1>そのアイデアを、<br><span class="accent">価値あるアプリ</span>に。</h1>
+          <p class="hero-lead">企画・要件定義からUI/UXデザイン、開発、リリース後の運用・改善まで。AIも活用し、成果につながるアプリを一気通貫で開発します。</p>
+          <div class="hero-ctas">
+            <a class="btn btn-fill" href="mailto:iaspira@goatmail.uk?subject=【アプリ開発】無料相談">無料で相談する</a>
+            <a class="btn btn-line" href="https://lin.ee/VC0YXHV" target="_blank" rel="noopener">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 5.64 2 10.13c0 4.02 3.57 7.39 8.39 8.03.33.07.77.22.89.5.1.26.07.66.03.92l-.14.87c-.04.26-.2 1.02.89.56 1.1-.46 5.91-3.48 8.07-5.96C21.62 13.4 22 11.83 22 10.13 22 5.64 17.52 2 12 2z"/></svg>
+              LINEで相談
+            </a>
+            <a class="btn btn-ghost" href="mailto:iaspira@goatmail.uk?subject=【アプリ開発】資料・お見積り相談">資料・お見積りを相談する</a>
+          </div>
+          <div class="hero-chips">
+            <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"/><path d="M12 12l8-4.5M12 12v9M12 12L4 7.5"/></svg>企画・要件定義から伴走</span>
+            <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="7" y="3" width="10" height="18" rx="2.5"/><path d="M10.5 18.5h3"/></svg>iOS・Android両対応</span>
+            <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M12 4l1.7 4.3L18 10l-4.3 1.7L12 16l-1.7-4.3L6 10l4.3-1.7L12 4z"/><path d="M18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9L18 15z"/></svg>AI機能の実装・活用</span>
+            <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M21 12a9 9 0 11-2.6-6.4"/><path d="M21 4v5h-5"/></svg>公開後の運用・保守</span>
+          </div>
+        </div>
+      </div>
+      <p class="tate" aria-hidden="true">手のひらに、新しい日常を。</p>
+      <div class="scroll-cue" aria-hidden="true">SCROLL</div>
+    </section>
+
+    <!-- ===== 実績バンド ===== -->
+    <section class="stats" aria-label="数字で見る実績">
+      <div class="wrap">
+        <div class="stats-in rv">
+          <div class="stat"><div class="num">50<small>+</small></div><div class="label">開発・制作実績</div></div>
+          <div class="stat"><div class="num">3<small>OS</small></div><div class="label">iOS / Android / Web</div></div>
+          <div class="stat"><div class="num">80<small>%</small></div><div class="label">平均継続率</div></div>
+          <div class="stat"><div class="num">8<small>週〜</small></div><div class="label">最短リリース</div></div>
+        </div>
+        <p class="sec-note">※実績の数値は目安です（一部イメージを含みます）。</p>
+      </div>
+    </section>
+
+    <!-- ===== FEATURES ===== -->
+    <section id="features">
+      <div class="wrap">
+        <div class="sec-head rv">
+          <p class="sec-eyebrow"><span class="num">01</span>Features</p>
+          <h2>選ばれる3つの理由</h2>
+        </div>
+        <div class="features-grid rv">
+          <article class="feature">
+            <span class="f-tag">UI / UX</span>
+            <p class="f-num">I.</p>
+            <div class="f-visual">
+              <svg viewBox="0 0 120 90" fill="none" aria-hidden="true">
+                <rect x="26" y="10" width="38" height="68" rx="6" stroke="#9d8cff" stroke-width="1.4"/>
+                <path d="M38 70h14" stroke="#9d8cff" stroke-width="1.2"/>
+                <rect x="33" y="20" width="24" height="14" rx="2" stroke="#9d8cff" stroke-width="1" opacity=".7"/>
+                <path d="M33 42h24M33 50h16" stroke="#9d8cff" stroke-width="1" opacity=".6"/>
+                <circle cx="86" cy="32" r="14" stroke="#c9beff" stroke-width="1.3"/>
+                <path d="M80 32l4 4 8-9" stroke="#c9beff" stroke-width="1.3"/>
+              </svg>
+            </div>
+            <h3>体験から考えるUI/UX設計</h3>
+            <p>ユーザー体験を起点に画面・導線を設計。使われ続けるプロダクトを、デザインの段階から作り込みます。</p>
+          </article>
+          <article class="feature">
+            <span class="f-tag">AI</span>
+            <p class="f-num">II.</p>
+            <div class="f-visual">
+              <svg viewBox="0 0 120 90" fill="none" aria-hidden="true">
+                <circle cx="56" cy="44" r="26" stroke="#9d8cff" stroke-width="1.4"/>
+                <circle cx="42" cy="38" r="3" fill="#9d8cff"/><circle cx="62" cy="30" r="3" fill="#9d8cff"/>
+                <circle cx="68" cy="52" r="3" fill="#9d8cff"/><circle cx="48" cy="56" r="3" fill="#9d8cff"/>
+                <path d="M42 38l20-8m6 22l-20 4m-6-18l26 14M62 30l6 22" stroke="#9d8cff" stroke-width=".8" opacity=".6"/>
+                <path d="M94 18l1.4 3.6L99 23l-3.6 1.4L94 28l-1.4-3.6L89 23l3.6-1.4L94 18z" stroke="#c9beff" stroke-width="1.1"/>
+              </svg>
+            </div>
+            <h3>AIを活用した機能実装</h3>
+            <p>チャット・レコメンド・画像解析など、生成AIや機械学習を組み込み、アプリの体験価値を高めます。</p>
+          </article>
+          <article class="feature">
+            <span class="f-tag">Growth</span>
+            <p class="f-num">III.</p>
+            <div class="f-visual">
+              <svg viewBox="0 0 120 90" fill="none" aria-hidden="true">
+                <path d="M16 74h88" stroke="#9d8cff" stroke-width="1.2" opacity=".6"/>
+                <path d="M20 64c14 0 16-18 30-18s14 10 26 4 12-22 28-26" stroke="#9d8cff" stroke-width="1.4"/>
+                <circle cx="50" cy="46" r="3" fill="#c9beff"/>
+                <circle cx="76" cy="50" r="3" fill="#c9beff"/>
+                <path d="M96 16l8 0 0 8" stroke="#c9beff" stroke-width="1.3"/>
+              </svg>
+            </div>
+            <h3>データに基づくグロース</h3>
+            <p>リリースして終わりにしません。利用データを分析し、継続率・CVRを高める改善を継続的に回します。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== PROCESS ===== -->
+    <section id="process">
+      <div class="wrap">
+        <div class="sec-head rv">
+          <p class="sec-eyebrow"><span class="num">02</span>Process</p>
+          <h2>開発の流れ</h2>
+        </div>
+        <div class="process-list rv">
+          <div class="step"><span class="s-num">01</span><h3>ヒアリング</h3><p>課題・目的・想いを丁寧にお伺いします。</p></div>
+          <div class="step"><span class="s-num">02</span><h3>企画・要件定義</h3><p>仕様・機能・優先度を整理し設計します。</p></div>
+          <div class="step"><span class="s-num">03</span><h3>UI/UXデザイン</h3><p>画面・導線をデザインし、試作で検証します。</p></div>
+          <div class="step"><span class="s-num">04</span><h3>開発</h3><p>アジャイルで開発し、随時ご確認いただけます。</p></div>
+          <div class="step"><span class="s-num">05</span><h3>テスト</h3><p>品質・セキュリティを検証し仕上げます。</p></div>
+          <div class="step"><span class="s-num">06</span><h3>リリース・運用</h3><p>公開後もデータを基に改善を継続します。</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SIGNATURE BAND ===== -->
+    <section class="mx-band">
+      <img src="./assets/img/band-app.jpg" alt="" decoding="async">
+      <div class="mx-band-in wrap">
+        <p class="mx-band-en">From Idea to Impact</p>
+        <p class="mx-band-jp">アイデアを、毎日使われるかたちに。</p>
+      </div>
+    </section>
+
+    <!-- ===== PRICE ===== -->
+    <section id="price">
+      <div class="wrap">
+        <div class="sec-head rv">
+          <p class="sec-eyebrow"><span class="num">03</span>Price</p>
+          <h2>料金の目安</h2>
+        </div>
+        <div class="price-grid rv">
+          <article class="plan">
+            <h3>ライトプラン</h3>
+            <div class="price"><small>初期 </small>80<small>万円〜</small></div>
+            <p class="p-sub">LIGHT</p>
+            <ul>
+              <li>MVP・小規模アプリ</li>
+              <li>1OS（iOS or Android）</li>
+              <li>基本機能・UI/UX設計</li>
+            </ul>
+            <a class="btn btn-ghost" href="mailto:iaspira@goatmail.uk?subject=【アプリ開発】ライトプランの相談">詳しく見る</a>
+          </article>
+          <article class="plan featured">
+            <span class="badge">人気 No.1</span>
+            <h3>スタンダードプラン</h3>
+            <div class="price"><small>初期 </small>150<small>万円〜</small></div>
+            <p class="p-sub">STANDARD</p>
+            <ul>
+              <li>iOS・Android両対応</li>
+              <li>API連携・AI機能の実装</li>
+              <li>公開申請・初期運用サポート</li>
+            </ul>
+            <a class="btn btn-fill" href="mailto:iaspira@goatmail.uk?subject=【アプリ開発】スタンダードプランの相談">詳しく見る</a>
+          </article>
+          <article class="plan">
+            <h3>プレミアムプラン</h3>
+            <div class="price"><small>初期 </small>250<small>万円〜</small></div>
+            <p class="p-sub">PREMIUM</p>
+            <ul>
+              <li>フルスクラッチ・大規模開発</li>
+              <li>運用・グロース支援</li>
+              <li>専任チーム・週次MTG</li>
+            </ul>
+            <a class="btn btn-ghost" href="mailto:iaspira@goatmail.uk?subject=【アプリ開発】プレミアムプランの相談">詳しく見る</a>
+          </article>
+        </div>
+        <p class="sec-note">※規模・機能・ご要望により変動します。月額の保守・運用は別途ご相談ください。</p>
+      </div>
+    </section>
+
+    <!-- ===== WORKS ===== -->
+    <section id="works">
+      <div class="wrap">
+        <div class="sec-head rv">
+          <p class="sec-eyebrow"><span class="num">04</span>Works</p>
+          <h2>導入事例・開発実績</h2>
+        </div>
+        <div class="works-grid rv">
+          <article class="work">
+            <div class="w-visual has-img"><img class="mx-img" src="./assets/img/app-1.jpg" alt="健康管理アプリ（イメージ）" decoding="async">
+              <svg viewBox="0 0 140 130" fill="none" aria-hidden="true">
+                <rect x="50" y="14" width="40" height="80" rx="7" stroke="#9d8cff" stroke-width="1.4"/>
+                <path d="M62 88h16" stroke="#9d8cff" stroke-width="1.2"/>
+                <path d="M70 52c-7-8-17-4-17 4 0 7 10 13 17 18 7-5 17-11 17-18 0-8-10-12-17-4z" stroke="#c9beff" stroke-width="1.3"/>
+                <path d="M30 110h80" stroke="#9d8cff" stroke-width=".8" opacity=".5"/>
+              </svg>
+            </div>
+            <div class="w-body">
+              <p class="w-cat">ヘルスケア</p>
+              <h3>健康管理アプリ｜継続率を大きく改善</h3>
+              <p>習慣化を促すUXとAIの提案機能で、毎日使われるアプリへ。</p>
+              <div class="w-kpi">
+                <div><b>+210%</b>MAU</div>
+                <div><b>78%</b>継続率</div>
+              </div>
+            </div>
+          </article>
+          <article class="work">
+            <div class="w-visual has-img"><img class="mx-img" src="./assets/img/app-2.jpg" alt="モバイルオーダーアプリ（イメージ）" decoding="async">
+              <svg viewBox="0 0 140 130" fill="none" aria-hidden="true">
+                <rect x="36" y="22" width="44" height="76" rx="7" stroke="#9d8cff" stroke-width="1.4"/>
+                <path d="M48 90h20" stroke="#9d8cff" stroke-width="1.2"/>
+                <rect x="44" y="34" width="28" height="10" rx="2" stroke="#9d8cff" stroke-width="1" opacity=".7"/>
+                <rect x="44" y="50" width="28" height="10" rx="2" stroke="#9d8cff" stroke-width="1" opacity=".7"/>
+                <circle cx="98" cy="44" r="16" stroke="#c9beff" stroke-width="1.3"/>
+                <path d="M92 44l4 4 9-10" stroke="#c9beff" stroke-width="1.3"/>
+              </svg>
+            </div>
+            <div class="w-body">
+              <p class="w-cat">飲食・店舗</p>
+              <h3>モバイルオーダー｜注文の手間をゼロに</h3>
+              <p>注文から決済までを一気通貫。待ち時間と機会損失を削減。</p>
+              <div class="w-kpi">
+                <div><b>+35%</b>注文単価</div>
+                <div><b>+48%</b>再来店</div>
+              </div>
+            </div>
+          </article>
+          <article class="work">
+            <div class="w-visual has-img"><img class="mx-img" src="./assets/img/app-3.jpg" alt="社内DXアプリ（イメージ）" decoding="async">
+              <svg viewBox="0 0 140 130" fill="none" aria-hidden="true">
+                <rect x="26" y="30" width="56" height="40" rx="4" stroke="#9d8cff" stroke-width="1.4"/>
+                <path d="M34 42h40M34 50h28M34 58h34" stroke="#9d8cff" stroke-width="1" opacity=".6"/>
+                <rect x="74" y="58" width="40" height="46" rx="5" stroke="#c9beff" stroke-width="1.3"/>
+                <path d="M82 72h24M82 80h16M82 88h20" stroke="#c9beff" stroke-width="1" opacity=".7"/>
+              </svg>
+            </div>
+            <div class="w-body">
+              <p class="w-cat">業務・DX</p>
+              <h3>社内DXアプリ｜現場の工数を削減</h3>
+              <p>紙とExcelの業務をアプリ化し、現場のムダを根本から解消。</p>
+              <div class="w-kpi">
+                <div><b>-62%</b>作業時間</div>
+                <div><b>94%</b>定着率</div>
+              </div>
+            </div>
+          </article>
+        </div>
+        <p class="sec-note">※成果はサービス・市況により異なります。掲載は一例で、内容はイメージです。</p>
+      </div>
+    </section>
+
+    <!-- ===== VOICE ===== -->
+    <section id="voice">
+      <div class="wrap">
+        <div class="sec-head rv">
+          <p class="sec-eyebrow"><span class="num">05</span>Voice</p>
+          <h2>お客様の声</h2>
+        </div>
+        <div class="voice-grid rv">
+          <article class="voice">
+            <span class="v-mark">“</span>
+            <p>アイデア段階の相談から要件整理まで、丁寧に伴走いただきました。UI/UXの提案が的確で、社内の合意形成もスムーズでした。</p>
+            <div class="v-stars" aria-label="星5つ">
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.4 4.8L18.5 22 12 17.8 5.5 22l1.9-7.7L2 9.5 9 9z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.4 4.8L18.5 22 12 17.8 5.5 22l1.9-7.7L2 9.5 9 9z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.4 4.8L18.5 22 12 17.8 5.5 22l1.9-7.7L2 9.5 9 9z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.4 4.8L18.5 22 12 17.8 5.5 22l1.9-7.7L2 9.5 9 9z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.4 4.8L18.5 22 12 17.8 5.5 22l1.9-7.7L2 9.5 9 9z"/></svg>
+            </div>
+            <div class="v-who"><b>製造業｜新規事業ご担当者</b>業務アプリ開発</div>
+          </article>
+          <article class="voice">
+            <span class="v-mark">“</span>
+            <p>リリース後の改善まで一気通貫で見てもらえます。データを基に継続率を高める提案が続き、安心して任せられました。</p>
+            <div class="v-stars" aria-label="星5つ">
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.4 4.8L18.5 22 12 17.8 5.5 22l1.9-7.7L2 9.5 9 9z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.4 4.8L18.5 22 12 17.8 5.5 22l1.9-7.7L2 9.5 9 9z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.4 4.8L18.5 22 12 17.8 5.5 22l1.9-7.7L2 9.5 9 9z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.4 4.8L18.5 22 12 17.8 5.5 22l1.9-7.7L2 9.5 9 9z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.4 4.8L18.5 22 12 17.8 5.5 22l1.9-7.7L2 9.5 9 9z"/></svg>
+            </div>
+            <div class="v-who"><b>ヘルスケア｜プロダクト責任者</b>継続率の改善</div>
+          </article>
+          <article class="voice">
+            <span class="v-mark">“</span>
+            <p>AI機能の実装で問い合わせ対応が大幅に効率化しました。スピード感のある開発で、立ち上げをしっかり支えてもらえました。</p>
+            <div class="v-stars" aria-label="星5つ">
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.4 4.8L18.5 22 12 17.8 5.5 22l1.9-7.7L2 9.5 9 9z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.4 4.8L18.5 22 12 17.8 5.5 22l1.9-7.7L2 9.5 9 9z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.4 4.8L18.5 22 12 17.8 5.5 22l1.9-7.7L2 9.5 9 9z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.4 4.8L18.5 22 12 17.8 5.5 22l1.9-7.7L2 9.5 9 9z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.4 4.8L18.5 22 12 17.8 5.5 22l1.9-7.7L2 9.5 9 9z"/></svg>
+            </div>
+            <div class="v-who"><b>小売｜代表</b>AI機能の実装</div>
+          </article>
+        </div>
+        <p class="sec-note">※掲載内容はイメージです。実際のお客様の声は順次掲載予定です。</p>
+      </div>
+    </section>
+
+    <!-- ===== CTA ===== -->
+    <section class="cta">
+      <div class="wrap">
+        <div class="cta-in rv">
+          <p class="sec-eyebrow" style="justify-content:center;">Consultation</p>
+          <h2>まずはお気軽にご相談ください</h2>
+          <p>アイデアの整理から最適な開発プランのご提案まで、専門チームが丁寧にサポートします。</p>
+          <div class="hero-ctas">
+            <a class="btn btn-fill" href="mailto:iaspira@goatmail.uk?subject=【アプリ開発】無料相談">無料で相談する</a>
+            <a class="btn btn-line" href="https://lin.ee/VC0YXHV" target="_blank" rel="noopener">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 5.64 2 10.13c0 4.02 3.57 7.39 8.39 8.03.33.07.77.22.89.5.1.26.07.66.03.92l-.14.87c-.04.26-.2 1.02.89.56 1.1-.46 5.91-3.48 8.07-5.96C21.62 13.4 22 11.83 22 10.13 22 5.64 17.52 2 12 2z"/></svg>
+              LINEで相談
+            </a>
+            <a class="btn btn-ghost" href="mailto:iaspira@goatmail.uk?subject=【アプリ開発】資料・お見積り相談">資料・お見積りを相談する</a>
+          </div>
+          <div class="cta-chips">
+            <span>相談無料</span><span>企画から伴走</span><span>保守・運用対応</span><span>秘密厳守</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FAQ ===== -->
+    <section id="faq" style="padding-top:0;">
+      <div class="wrap">
+        <div class="sec-head rv">
+          <p class="sec-eyebrow"><span class="num">06</span>FAQ</p>
+          <h2>よくあるご質問</h2>
+        </div>
+        <div class="faq-list rv">
+          <details><summary><span class="q">Q.</span>開発期間はどのくらいかかりますか？<span class="plus"></span></summary><p class="a">規模によりますが、MVPで約2〜3ヶ月、標準的なアプリで約4〜6ヶ月が目安です。</p></details>
+          <details><summary><span class="q">Q.</span>企画・要件定義から相談できますか？<span class="plus"></span></summary><p class="a">はい。アイデア段階からの伴走が得意です。要件整理・仕様策定からお手伝いします。</p></details>
+          <details><summary><span class="q">Q.</span>iOSとAndroidの両方に対応できますか？<span class="plus"></span></summary><p class="a">両OSに対応します。クロスプラットフォーム開発で効率よく構築することも可能です。</p></details>
+          <details><summary><span class="q">Q.</span>AI機能の実装もお願いできますか？<span class="plus"></span></summary><p class="a">はい。チャット・レコメンド・画像解析など、用途に合わせてAIを組み込みます。</p></details>
+          <details><summary><span class="q">Q.</span>リリース後の保守・運用は対応していますか？<span class="plus"></span></summary><p class="a">はい。保守・改善・グロース支援まで継続的にサポートします。</p></details>
+          <details><summary><span class="q">Q.</span>既存アプリの改修・リニューアルも可能ですか？<span class="plus"></span></summary><p class="a">可能です。現状を診断し、改善・機能追加・リニューアルをご提案します。</p></details>
+          <details><summary><span class="q">Q.</span>契約・お支払いの流れを教えてください。<span class="plus"></span></summary><p class="a">無料相談・お見積りの後にご契約いただきます。着手時と納品時など、段階的なお支払いに対応しています。</p></details>
+          <details><summary><span class="q">Q.</span>ソースコードや著作権はどうなりますか？<span class="plus"></span></summary><p class="a">納品物の権利はお客様へ譲渡し、ソースコード一式もお渡しします。詳細は契約時に取り決めます。</p></details>
+          <details><summary><span class="q">Q.</span>NDA（秘密保持契約）は結べますか？<span class="plus"></span></summary><p class="a">はい。ご相談の前でもNDAの締結が可能です。安心してご相談ください。</p></details>
+          <details><summary><span class="q">Q.</span>開発中の進捗はどう確認できますか？<span class="plus"></span></summary><p class="a">アジャイルで開発し、定例MTGとデモ環境で随時ご確認いただけます。仕様変更にも柔軟に対応します。</p></details>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p class="foot-word" aria-hidden="true">IASPIRA</p>
+      <div class="foot-in">
+        <nav class="foot-links" aria-label="関連ページ">
+          <a href="./index.html">コーポレートトップ</a>
+          <a href="./iaspira-jewelry.html">オーダーメイド宝飾</a>
+          <a href="./iaspira-trade.html">宝飾輸出入</a>
+          <a href="./iaspira-web.html">ホームページ制作</a>
+          <a href="./iaspira-ad.html">広告代理店</a>
+          <a href="./iaspira-ai.html">AIエージェント</a>
+        </nav>
+        <p class="copy">© IASPIRA — APP DEVELOPMENT</p>
+      </div>
+    </div>
+  </footer>
+
+  <script type="importmap">
+    { "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    } }
+  </script>
+  <!-- ★差し替え可能ブロック★ Hero 3D（マウント: #device3d）。ユーザー提供3Dコードに載せ替え可。 -->
+  <script type="module" data-3d="hero-glass-device">
+    import * as THREE from 'three';
+    import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+    const mount = document.getElementById('device3d');
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    try {
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.1;
+      mount.appendChild(renderer.domElement);
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(36, 1, .1, 60);
+      camera.position.set(0, .2, 7.4);
+
+      const pmrem = new THREE.PMREMGenerator(renderer);
+      scene.environment = pmrem.fromScene(new RoomEnvironment(), .05).texture;
+
+      // 浮遊するガラスのデバイスと、周回するUIパネル
+      const group = new THREE.Group();
+      const bodyMat = new THREE.MeshPhysicalMaterial({
+        color: 0x9d8cff, metalness: .2, roughness: .12,
+        transmission: .85, thickness: .8, ior: 1.5,
+        envMapIntensity: 1.4
+      });
+      const device = new THREE.Mesh(new THREE.BoxGeometry(1.5, 3.1, .14), bodyMat);
+      group.add(device);
+      // 画面の発光面
+      const screen = new THREE.Mesh(
+        new THREE.PlaneGeometry(1.32, 2.9),
+        new THREE.MeshBasicMaterial({ color: 0x16142e })
+      );
+      screen.position.z = .075; group.add(screen);
+      const glow = new THREE.Mesh(
+        new THREE.PlaneGeometry(1.1, .5),
+        new THREE.MeshBasicMaterial({ color: 0x5a7bff, transparent: true, opacity: .55 })
+      );
+      glow.position.set(0, .9, .08); group.add(glow);
+      const glow2 = new THREE.Mesh(
+        new THREE.PlaneGeometry(1.1, 1.3),
+        new THREE.MeshBasicMaterial({ color: 0x9d8cff, transparent: true, opacity: .28 })
+      );
+      glow2.position.set(0, -.45, .08); group.add(glow2);
+
+      // 周回するUIカード（ガラスの小片）
+      const cardMat = new THREE.MeshPhysicalMaterial({
+        color: 0xc9beff, metalness: .1, roughness: .15,
+        transmission: .8, thickness: .4, ior: 1.4, envMapIntensity: 1.3
+      });
+      const cards = [];
+      for (let i = 0; i < 4; i++) {
+        const c = new THREE.Mesh(new THREE.BoxGeometry(.85, .5, .05), cardMat);
+        cards.push(c); scene.add(c);
+      }
+      group.rotation.y = -.35;
+      group.scale.setScalar(.82);
+      scene.add(group);
+
+      const l1 = new THREE.PointLight(0xb9aaff, 36, 30); l1.position.set(4, 3, 4); scene.add(l1);
+      const l2 = new THREE.PointLight(0x5a7bff, 22, 30); l2.position.set(-4, -2, 3); scene.add(l2);
+      scene.add(new THREE.AmbientLight(0x2c2a4a, 1.8));
+      const key = new THREE.DirectionalLight(0xffffff, 1.2);
+      key.position.set(3, 5, 2); scene.add(key);
+
+      const N = 200, pos = new Float32Array(N * 3);
+      for (let i = 0; i < N; i++) {
+        const r = 2.4 + Math.random() * 3, t = Math.random() * Math.PI * 2, p = Math.acos(2 * Math.random() - 1);
+        pos[i*3] = r * Math.sin(p) * Math.cos(t);
+        pos[i*3+1] = r * Math.cos(p) * .8;
+        pos[i*3+2] = r * Math.sin(p) * Math.sin(t);
+      }
+      const pgeo = new THREE.BufferGeometry();
+      pgeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      const dust = new THREE.Points(pgeo, new THREE.PointsMaterial({
+        color: 0xd9d2ff, size: .024, transparent: true, opacity: .75,
+        blending: THREE.AdditiveBlending, depthWrite: false
+      }));
+      scene.add(dust);
+
+      let mx = 0, my = 0;
+      addEventListener('pointermove', e => {
+        mx = (e.clientX / innerWidth - .5) * 2;
+        my = (e.clientY / innerHeight - .5) * 2;
+      }, { passive: true });
+
+      function resize() {
+        const w = mount.clientWidth, h = mount.clientHeight;
+        renderer.setSize(w, h);
+        camera.aspect = w / h; camera.updateProjectionMatrix();
+      }
+      new ResizeObserver(resize).observe(mount);
+      resize();
+
+      const clock = new THREE.Clock();
+      renderer.setAnimationLoop(() => {
+        const t = clock.getElapsedTime();
+        if (!reduced) {
+          group.position.y = Math.sin(t * .8) * .14;
+          group.rotation.y = -.35 + Math.sin(t * .3) * .12;
+          for (let i = 0; i < 4; i++) {
+            const a = t * .4 + i * Math.PI / 2;
+            cards[i].position.set(Math.cos(a) * 2.5, Math.sin(a * 1.3) * .9, Math.sin(a) * 1.1);
+            cards[i].rotation.y = -a * .5;
+            cards[i].rotation.x = Math.sin(a) * .2;
+          }
+          dust.rotation.y = -t * .04;
+        }
+        group.rotation.x = THREE.MathUtils.lerp(group.rotation.x, my * .14, .04);
+        group.rotation.z = THREE.MathUtils.lerp(group.rotation.z, mx * .08, .04);
+        renderer.render(scene, camera);
+      });
+      if (reduced) {
+        for (let i = 0; i < 4; i++) {
+          const a = i * Math.PI / 2;
+          cards[i].position.set(Math.cos(a) * 2.5, Math.sin(a * 1.3) * .9, Math.sin(a) * 1.1);
+        }
+        renderer.render(scene, camera); renderer.setAnimationLoop(null);
+      }
+    } catch (e) { /* WebGL不可ならグラデ背景のまま */ }
+  </script>
+
+  <script>
+    const nav = document.getElementById('nav');
+    addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 40), { passive: true });
+    const io = new IntersectionObserver(es => es.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    }), { threshold: .12 });
+    document.querySelectorAll('.rv').forEach(el => io.observe(el));
+  </script>
+  <script type="module" src="./assets/iaspira-motion.js?v=20260707h"></script>
+</body>
+</html>

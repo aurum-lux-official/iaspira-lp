@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IASPIRA｜生成AIとエージェントで、業務を自動化する。</title>
+  <meta name="description" content="業務に合わせたAIエージェントの構築、社内データを活かすRAG、既存ツール連携まで。定型業務を自動化し、人はより創造的な仕事へ。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Shippori+Mincho:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070d0c;
+      --bg-2: #0c1513;
+      --ink: #eef5f2;
+      --sub: #b0c2bc;
+      --faint: #78918a;
+      --line: rgb(238 245 242 / 10%);
+      --line-strong: rgb(238 245 242 / 18%);
+      --glass: rgb(255 255 255 / 3.5%);
+      --glass-2: rgb(255 255 255 / 6%);
+      --acc: #3ddca8;
+      --acc-deep: #16b8d8;
+      --acc2: #a8efd6;
+      --acc-dim: rgb(61 220 168 / 45%);
+      --grad-acc: linear-gradient(115deg, #6fe8c0, #16b8d8);
+      --display: "Cormorant Garamond", "Shippori Mincho", serif;
+      --mincho: "Shippori Mincho", ui-serif, serif;
+      --gothic: "Zen Kaku Gothic New", "Hiragino Sans", sans-serif;
+      --max: 1180px;
+      --r: 4px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; background: var(--bg); color: var(--ink);
+      font-family: var(--gothic); font-size: 16px; line-height: 1.95;
+      letter-spacing: .02em; -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility; overflow-x: hidden;
+    }
+    ::selection { background: rgb(61 220 168 / 26%); }
+    a { color: inherit; text-decoration: none; }
+    a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--acc); outline-offset: 3px; border-radius: var(--r); }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+      .rv { opacity: 1 !important; transform: none !important; }
+    }
+    .wrap { width: min(var(--max), calc(100% - 48px)); margin: 0 auto; }
+
+    .atmosphere {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 70rem 44rem at 78% -8%, rgb(61 220 168 / 10%), transparent 60%),
+        radial-gradient(ellipse 56rem 40rem at 6% 34%, rgb(22 184 216 / 7%), transparent 62%),
+        radial-gradient(ellipse 60rem 50rem at 90% 96%, rgb(168 239 214 / 6%), transparent 60%);
+    }
+    .atmosphere::after {
+      content: ""; position: absolute; inset: 0; opacity: .5;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    main, header.nav, footer { position: relative; z-index: 1; }
+
+    .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 50; border-bottom: 1px solid transparent; transition: background .4s ease, border-color .4s ease; }
+    .nav.scrolled { background: rgb(7 13 12 / 78%); backdrop-filter: blur(18px) saturate(1.1); border-bottom-color: var(--line); }
+    .nav-in { display: flex; align-items: center; gap: 28px; height: 78px; }
+    .brand { display: flex; align-items: baseline; gap: 14px; margin-right: auto; }
+    .brand .mark { font-family: var(--display); font-weight: 500; font-size: 24px; letter-spacing: .3em; color: var(--ink); }
+    .brand .sub { font-size: 10px; letter-spacing: .32em; color: var(--acc-dim); text-transform: uppercase; }
+    .nav-links { display: flex; gap: 30px; font-size: 13px; letter-spacing: .08em; }
+    .nav-links a { color: var(--sub); transition: color .3s; position: relative; padding: 4px 0; }
+    .nav-links a::after { content: ""; position: absolute; left: 0; bottom: 0; width: 0; height: 1px; background: var(--acc); transition: width .35s ease; }
+    .nav-links a:hover { color: var(--ink); }
+    .nav-links a:hover::after { width: 100%; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 14px 30px; border-radius: 999px; font-size: 14px; font-weight: 500;
+      letter-spacing: .1em; cursor: pointer; transition: all .35s ease;
+      border: 1px solid var(--line-strong); position: relative; overflow: hidden;
+      white-space: nowrap;
+    }
+    .btn-fill { background: var(--grad-acc); color: #04211a; border-color: transparent; font-weight: 700; box-shadow: 0 8px 32px rgb(61 220 168 / 20%); }
+    .btn-fill:hover { transform: translateY(-2px); box-shadow: 0 14px 44px rgb(61 220 168 / 32%); }
+    .btn-ghost { color: var(--ink); background: rgb(255 255 255 / 3%); }
+    .btn-ghost:hover { border-color: var(--acc-dim); background: rgb(255 255 255 / 6%); transform: translateY(-2px); }
+    .btn-line { color: #9fe8b8; border-color: rgb(6 199 85 / 40%); background: rgb(6 199 85 / 7%); }
+    .btn-line:hover { background: rgb(6 199 85 / 14%); transform: translateY(-2px); }
+    .btn-nav { padding: 11px 24px; font-size: 12.5px; }
+    @media (max-width: 900px) { .nav-links { display: none; } }
+    @media (max-width: 620px) {
+      .brand .sub { display: none; }
+      .btn-nav { padding: 10px 16px; font-size: 11.5px; letter-spacing: .06em; }
+    }
+
+    .hero { position: relative; min-height: 100svh; display: flex; align-items: center; padding: 130px 0 80px; }
+    #neural3d { position: absolute; top: 0; right: -4%; width: 58%; height: 100%; z-index: 0; }
+    #neural3d canvas { display: block; }
+    .hero-glow { position: absolute; top: 30%; right: 14%; width: 30rem; height: 30rem; background: radial-gradient(circle, rgb(61 220 168 / 11%), transparent 65%); filter: blur(10px); pointer-events: none; }
+    .hero-in { position: relative; z-index: 2; max-width: 700px; }
+    .hero-eyebrow {
+      display: flex; align-items: center; gap: 16px;
+      font-family: var(--display); font-style: italic; font-size: 15px;
+      letter-spacing: .42em; color: var(--acc); text-transform: uppercase; margin-bottom: 34px;
+    }
+    .hero-eyebrow::before { content: ""; width: 56px; height: 1px; background: var(--acc-dim); }
+    h1 { font-family: var(--mincho); font-weight: 600; font-size: clamp(31px, 4.1vw, 54px); line-height: 1.55; letter-spacing: .055em; margin: 0 0 30px; }
+    h1 .accent { background: var(--grad-acc); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .hero-lead { color: var(--sub); font-size: 16.5px; line-height: 2.15; margin: 0 0 44px; max-width: 33em; }
+    .hero-ctas { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 52px; }
+    .hero-chips { display: flex; flex-wrap: wrap; gap: 10px 26px; }
+    .chip { display: inline-flex; align-items: center; gap: 9px; font-size: 12.5px; letter-spacing: .1em; color: var(--sub); }
+    .chip svg { width: 15px; height: 15px; stroke: var(--acc); flex: none; }
+    .tate {
+      position: absolute; right: 38px; top: 50%; transform: translateY(-50%);
+      writing-mode: vertical-rl; z-index: 3;
+      font-family: var(--mincho); font-size: 13px; letter-spacing: .6em; color: var(--faint);
+      border-right: 1px solid var(--line); padding-right: 18px;
+    }
+    .scroll-cue {
+      position: absolute; bottom: 38px; left: 50%; transform: translateX(-50%);
+      font-size: 10px; letter-spacing: .4em; color: var(--faint); z-index: 3;
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+    }
+    .scroll-cue::after { content: ""; width: 1px; height: 46px; background: linear-gradient(180deg, var(--acc-dim), transparent); animation: cue 2.4s ease infinite; }
+    @keyframes cue { 0% { transform: scaleY(0); transform-origin: top; } 55% { transform: scaleY(1); transform-origin: top; } 56% { transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
+    @media (max-height: 880px) { .scroll-cue { display: none; } }
+    @media (max-width: 900px) {
+      #neural3d { right: -22%; width: 100%; opacity: .5; }
+      .tate { display: none; }
+      .hero-in { max-width: 100%; }
+    }
+
+    section { padding: 110px 0; position: relative; }
+    .sec-head { margin-bottom: 64px; }
+    .sec-eyebrow {
+      display: flex; align-items: center; gap: 16px;
+      font-family: var(--display); font-style: italic; font-size: 13px;
+      letter-spacing: .42em; color: var(--acc); text-transform: uppercase; margin-bottom: 22px;
+    }
+    .sec-eyebrow .num { font-style: normal; color: var(--faint); letter-spacing: .2em; }
+    .sec-eyebrow::after { content: ""; flex: 1; max-width: 120px; height: 1px; background: var(--line-strong); }
+    h2 { font-family: var(--mincho); font-weight: 600; font-size: clamp(26px, 3.4vw, 40px); line-height: 1.6; letter-spacing: .05em; margin: 0; }
+    .sec-note { color: var(--faint); font-size: 12.5px; margin-top: 28px; }
+    .rv { opacity: 0; transform: translateY(28px); transition: opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1); }
+    .rv.in { opacity: 1; transform: none; }
+
+    .stats { padding: 0; }
+    .stats-in { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .stat { padding: 44px 20px; text-align: center; border-left: 1px solid var(--line); }
+    .stat:first-child { border-left: 0; }
+    .stat .num {
+      font-family: var(--display); font-weight: 500; font-size: clamp(38px, 4.6vw, 58px); line-height: 1.1;
+      background: linear-gradient(160deg, var(--ink) 30%, var(--acc));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .stat .num small { font-size: .45em; letter-spacing: .06em; }
+    .stat .label { font-size: 12px; letter-spacing: .22em; color: var(--faint); margin-top: 10px; }
+    @media (max-width: 760px) {
+      .stats-in { grid-template-columns: 1fr 1fr; }
+      .stat:nth-child(3) { border-left: 0; }
+      .stat:nth-child(n+3) { border-top: 1px solid var(--line); }
+    }
+
+    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+    .feature { background: var(--bg); padding: 52px 38px 48px; position: relative; transition: background .5s ease; }
+    .feature:hover { background: var(--bg-2); }
+    .feature .f-num { font-family: var(--display); font-style: italic; font-size: 15px; color: var(--acc-dim); letter-spacing: .2em; margin-bottom: 26px; }
+    .feature .f-visual { height: 96px; margin-bottom: 30px; display: flex; align-items: center; }
+    .feature .f-visual svg { height: 84px; width: auto; }
+    .feature h3 { font-family: var(--mincho); font-size: 20px; font-weight: 600; letter-spacing: .06em; margin: 0 0 14px; }
+    .feature p { color: var(--sub); font-size: 14.5px; margin: 0; }
+    .feature .f-tag { position: absolute; top: 50px; right: 34px; font-family: var(--display); font-style: italic; font-size: 12px; letter-spacing: .3em; color: var(--faint); text-transform: uppercase; }
+    @media (max-width: 900px) { .features-grid { grid-template-columns: 1fr; } }
+
+    .process-list { display: grid; gap: 0; border-top: 1px solid var(--line); }
+    .step {
+      display: grid; grid-template-columns: 130px 280px 1fr; gap: 28px;
+      align-items: baseline; padding: 40px 8px; border-bottom: 1px solid var(--line);
+      transition: background .4s ease, padding-left .4s ease;
+    }
+    .step:hover { background: rgb(255 255 255 / 2%); padding-left: 20px; }
+    .step .s-num { font-family: var(--display); font-style: italic; font-weight: 400; font-size: 42px; color: var(--acc-dim); line-height: 1; }
+    .step h3 { font-family: var(--mincho); font-size: 21px; font-weight: 600; letter-spacing: .08em; margin: 0; }
+    .step p { color: var(--sub); font-size: 14.5px; margin: 0; }
+    @media (max-width: 820px) {
+      .step { grid-template-columns: 64px 1fr; }
+      .step p { grid-column: 2; }
+    }
+
+    .price-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; align-items: stretch; }
+    .plan {
+      border: 1px solid var(--line); background: var(--glass); padding: 46px 36px 40px;
+      position: relative; display: flex; flex-direction: column;
+      transition: transform .4s ease, border-color .4s ease, background .4s ease;
+    }
+    .plan:hover { transform: translateY(-6px); border-color: var(--line-strong); background: var(--glass-2); }
+    .plan.featured { border-color: var(--acc-dim); background: linear-gradient(180deg, rgb(61 220 168 / 7%), rgb(255 255 255 / 3%)); }
+    .plan .badge {
+      position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+      font-size: 11px; letter-spacing: .26em; padding: 6px 18px;
+      background: var(--acc); color: #04211a; border-radius: 999px; font-weight: 700; white-space: nowrap;
+    }
+    .plan h3 { font-family: var(--mincho); font-size: 19px; font-weight: 600; letter-spacing: .14em; margin: 0 0 22px; }
+    .plan .price { font-family: var(--display); font-weight: 500; font-size: 44px; line-height: 1.1; margin-bottom: 6px; }
+    .plan .price small { font-size: .42em; color: var(--sub); letter-spacing: .1em; }
+    .plan .p-sub { font-size: 12px; color: var(--faint); letter-spacing: .14em; margin-bottom: 30px; }
+    .plan ul { list-style: none; margin: 0 0 36px; padding: 0; display: grid; gap: 13px; flex: 1; }
+    .plan li { display: flex; gap: 12px; align-items: flex-start; font-size: 14px; color: var(--sub); }
+    .plan li::before { content: ""; flex: none; width: 6px; height: 6px; margin-top: 11px; background: var(--acc); transform: rotate(45deg); }
+    .plan .btn { width: 100%; }
+    @media (max-width: 900px) { .price-grid { grid-template-columns: 1fr; } }
+
+    .works-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+    .work { border: 1px solid var(--line); background: var(--glass); overflow: hidden; transition: transform .4s ease, border-color .4s ease; }
+    .work:hover { transform: translateY(-6px); border-color: var(--acc-dim); }
+    .work .w-visual {
+      height: 210px; display: flex; align-items: center; justify-content: center;
+      background:
+        radial-gradient(circle at 50% 64%, rgb(61 220 168 / 11%), transparent 62%),
+        linear-gradient(180deg, var(--bg-2), #0d1c18);
+      border-bottom: 1px solid var(--line);
+    }
+    .work .w-visual svg { height: 130px; }
+    .work .w-body { padding: 28px 28px 30px; }
+    .work .w-cat { font-family: var(--display); font-style: italic; font-size: 12px; letter-spacing: .3em; color: var(--acc); text-transform: uppercase; margin-bottom: 10px; }
+    .work h3 { font-family: var(--mincho); font-size: 18px; font-weight: 600; letter-spacing: .05em; margin: 0 0 12px; }
+    .work p { font-size: 13.5px; color: var(--sub); margin: 0 0 18px; }
+    .work .w-kpi { display: flex; gap: 18px; border-top: 1px solid var(--line); padding-top: 16px; }
+    .work .w-kpi div { font-size: 11px; color: var(--faint); letter-spacing: .1em; }
+    .work .w-kpi b { display: block; font-family: var(--display); font-size: 22px; font-weight: 500; color: var(--ink); letter-spacing: .04em; }
+    @media (max-width: 900px) { .works-grid { grid-template-columns: 1fr; } }
+
+    .voice-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+    .voice { border: 1px solid var(--line); background: var(--glass); padding: 38px 32px; display: flex; flex-direction: column; gap: 18px; transition: border-color .4s ease; }
+    .voice:hover { border-color: var(--line-strong); }
+    .voice .v-mark { font-family: var(--display); font-style: italic; font-size: 54px; line-height: .6; color: var(--acc-dim); }
+    .voice p { margin: 0; font-size: 14px; color: var(--sub); flex: 1; }
+    .voice .v-stars { display: flex; gap: 4px; }
+    .voice .v-stars svg { width: 14px; height: 14px; fill: var(--acc); }
+    .voice .v-who { font-size: 12px; letter-spacing: .12em; color: var(--faint); border-top: 1px solid var(--line); padding-top: 16px; }
+    .voice .v-who b { color: var(--ink); font-weight: 500; display: block; font-size: 13px; margin-bottom: 2px; }
+    @media (max-width: 900px) { .voice-grid { grid-template-columns: 1fr; } }
+
+    .cta { padding: 130px 0; }
+    .cta-in {
+      border: 1px solid var(--acc-dim); position: relative;
+      padding: 90px 40px; text-align: center; overflow: hidden;
+      background:
+        radial-gradient(ellipse 40rem 22rem at 50% 120%, rgb(61 220 168 / 11%), transparent 65%),
+        var(--glass);
+    }
+    .cta-in::before, .cta-in::after { content: ""; position: absolute; width: 56px; height: 56px; pointer-events: none; }
+    .cta-in::before { top: 14px; left: 14px; border-top: 1px solid var(--acc); border-left: 1px solid var(--acc); }
+    .cta-in::after { bottom: 14px; right: 14px; border-bottom: 1px solid var(--acc); border-right: 1px solid var(--acc); }
+    .cta h2 { margin-bottom: 24px; }
+    .cta p { color: var(--sub); max-width: 36em; margin: 0 auto 44px; }
+    .cta .hero-ctas { justify-content: center; margin-bottom: 0; }
+
+    .faq-list { max-width: 860px; border-top: 1px solid var(--line); }
+    details { border-bottom: 1px solid var(--line); }
+    summary {
+      list-style: none; cursor: pointer; display: flex; align-items: baseline; gap: 22px;
+      padding: 28px 8px; font-family: var(--mincho); font-size: 16.5px; font-weight: 500;
+      letter-spacing: .04em; transition: color .3s;
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary:hover { color: var(--acc); }
+    summary .q { font-family: var(--display); font-style: italic; color: var(--acc); font-size: 18px; flex: none; }
+    summary .plus { margin-left: auto; flex: none; width: 14px; height: 14px; position: relative; align-self: center; }
+    summary .plus::before, summary .plus::after { content: ""; position: absolute; background: var(--acc); transition: transform .35s ease; }
+    summary .plus::before { left: 0; top: 6px; width: 14px; height: 1px; }
+    summary .plus::after { left: 6.5px; top: 0; width: 1px; height: 14px; }
+    details[open] summary .plus::after { transform: scaleY(0); }
+    details .a { padding: 0 8px 30px 52px; color: var(--sub); font-size: 14.5px; max-width: 46em; }
+
+    footer { border-top: 1px solid var(--line); padding: 80px 0 46px; overflow: hidden; }
+    .foot-word {
+      font-family: var(--display); font-weight: 400; letter-spacing: .22em;
+      font-size: clamp(60px, 11vw, 150px); line-height: 1; text-align: center;
+      color: transparent; -webkit-text-stroke: 1px rgb(238 245 242 / 13%);
+      user-select: none; margin-bottom: 60px;
+    }
+    .foot-in { display: flex; flex-wrap: wrap; gap: 28px; align-items: center; justify-content: space-between; }
+    .foot-links { display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 12px; color: var(--faint); }
+    .foot-links a:hover { color: var(--acc); }
+    .copy { font-size: 11px; letter-spacing: .2em; color: var(--faint); }
+  </style>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 3h12l4 6-10 12L2 9l4-6z' fill='%23d9bd8e'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./assets/iaspira-motion.css?v=20260707h">
+</head>
+<body>
+  <script>(function(){var d=document,c=d.documentElement.classList;if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;c.add("mx-pre");setTimeout(function(){c.remove("mx-pre")},1400);var seen=null;try{seen=sessionStorage.getItem("mxIntro");sessionStorage.setItem("mxIntro","1")}catch(e){}if(!seen){var o=d.createElement("div");o.className="mx-intro";o.innerHTML='<span class="w">IASPIRA</span>';d.body.appendChild(o);o.addEventListener("animationend",function(e){if(e.animationName==="mx-intro-leave")o.remove()});setTimeout(function(){o.parentNode&&o.remove()},3400);}})();</script>
+  <div class="atmosphere" aria-hidden="true"></div>
+
+  <header class="nav" id="nav">
+    <div class="wrap nav-in">
+      <a class="brand" href="./index.html">
+        <span class="mark">IASPIRA</span>
+        <span class="sub">AI Agent &amp; Automation</span>
+      </a>
+      <nav class="nav-links" aria-label="ページ内ナビゲーション">
+        <a href="#features">特徴</a>
+        <a href="#process">導入の流れ</a>
+        <a href="#price">料金の目安</a>
+        <a href="#works">導入事例</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <a class="btn btn-fill btn-nav" href="mailto:iaspira@goatmail.uk?subject=【AIエージェント】無料相談">無料で相談する</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- ===== HERO ===== -->
+    <section class="hero" id="top">
+      <div id="neural3d" aria-hidden="true"><div class="hero-glow"></div></div>
+      <div class="wrap">
+        <div class="hero-in">
+          <p class="hero-eyebrow">IASPIRA — AI Agent &amp; Automation</p>
+          <h1>生成AIとエージェントで、<br><span class="accent">業務を自動化</span>する。</h1>
+          <p class="hero-lead">業務に合わせたAIエージェントの構築、社内データを活かすRAG、既存ツール連携まで。定型業務を自動化し、人はより創造的な仕事へ。</p>
+          <div class="hero-ctas">
+            <a class="btn btn-fill" href="mailto:iaspira@goatmail.uk?subject=【AIエージェント】無料相談">無料で相談する</a>
+            <a class="btn btn-line" href="https://lin.ee/VC0YXHV" target="_blank" rel="noopener">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 5.64 2 10.13c0 4.02 3.57 7.39 8.39 8.03.33.07.77.22.89.5.1.26.07.66.03.92l-.14.87c-.04.26-.2 1.02.89.56 1.1-.46 5.91-3.48 8.07-5.96C21.62 13.4 22 11.83 22 10.13 22 5.64 17.52 2 12 2z"/></svg>
+              LINEで相談
+            </a>
+            <a class="btn btn-ghost" href="mailto:iaspira@goatmail.uk?subject=【AIエージェント】資料・お見積り相談">資料・お見積りを相談する</a>
+          </div>
+          <div class="hero-chips">
+            <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M8 10h8M8 14h5"/><path d="M21 12a9 9 0 10-3.5 7.1L21 21l-1-3.4A8.96 8.96 0 0021 12z"/></svg>業務ヒアリング</span>
+            <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/><path d="M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/></svg>社内データ活用（RAG）</span>
+            <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8 7.5l8 0M7.5 8l3.2 7.6M16.5 8l-3.2 7.6"/></svg>既存ツール連携</span>
+            <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M12 3l7 4v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V7l7-4z"/><path d="M9 12l2 2 4-4"/></svg>セキュアな運用</span>
+          </div>
+        </div>
+      </div>
+      <p class="tate" aria-hidden="true">知性を、業務のとなりに。</p>
+      <div class="scroll-cue" aria-hidden="true">SCROLL</div>
+    </section>
+
+    <!-- ===== 実績バンド ===== -->
+    <section class="stats" aria-label="数字で見る実績">
+      <div class="wrap">
+        <div class="stats-in rv">
+          <div class="stat"><div class="num">70<small>%</small></div><div class="label">業務時間を削減</div></div>
+          <div class="stat"><div class="num">24<small>h</small></div><div class="label">無人で一次対応</div></div>
+          <div class="stat"><div class="num">2<small>週〜</small></div><div class="label">PoC最短スタート</div></div>
+          <div class="stat"><div class="num">5<small>+</small></div><div class="label">連携可能ツール</div></div>
+        </div>
+        <p class="sec-note">※実績の数値は目安です（一部イメージを含みます）。</p>
+      </div>
+    </section>
+
+    <!-- ===== FEATURES ===== -->
+    <section id="features">
+      <div class="wrap">
+        <div class="sec-head rv">
+          <p class="sec-eyebrow"><span class="num">01</span>Features</p>
+          <h2>選ばれる3つの理由</h2>
+        </div>
+        <div class="features-grid rv">
+          <article class="feature">
+            <span class="f-tag">Agent</span>
+            <p class="f-num">I.</p>
+            <div class="f-visual">
+              <svg viewBox="0 0 120 90" fill="none" aria-hidden="true">
+                <rect x="34" y="22" width="52" height="44" rx="8" stroke="#3ddca8" stroke-width="1.4"/>
+                <circle cx="50" cy="42" r="4" stroke="#3ddca8" stroke-width="1.2"/>
+                <circle cx="70" cy="42" r="4" stroke="#3ddca8" stroke-width="1.2"/>
+                <path d="M52 56h16" stroke="#3ddca8" stroke-width="1.2"/>
+                <path d="M60 22v-8M48 14h24" stroke="#a8efd6" stroke-width="1.2"/>
+                <path d="M24 76c10-6 62-6 72 0" stroke="#a8efd6" stroke-width="1" stroke-dasharray="3 5"/>
+              </svg>
+            </div>
+            <h3>業務に合わせたエージェント</h3>
+            <p>問い合わせ対応・社内ヘルプデスク・営業支援など、業務に最適化したAIエージェントを構築します。</p>
+          </article>
+          <article class="feature">
+            <span class="f-tag">RAG</span>
+            <p class="f-num">II.</p>
+            <div class="f-visual">
+              <svg viewBox="0 0 120 90" fill="none" aria-hidden="true">
+                <ellipse cx="42" cy="24" rx="20" ry="7" stroke="#3ddca8" stroke-width="1.3"/>
+                <path d="M22 24v34c0 4 9 7 20 7s20-3 20-7V24" stroke="#3ddca8" stroke-width="1.3"/>
+                <path d="M22 41c0 4 9 7 20 7s20-3 20-7" stroke="#3ddca8" stroke-width="1" opacity=".6"/>
+                <circle cx="88" cy="52" r="16" stroke="#a8efd6" stroke-width="1.3"/>
+                <path d="M99 63l8 8" stroke="#a8efd6" stroke-width="1.4"/>
+                <path d="M62 38c8-2 14 2 18 6" stroke="#a8efd6" stroke-width="1" stroke-dasharray="3 4"/>
+              </svg>
+            </div>
+            <h3>社内データを活かすRAG</h3>
+            <p>マニュアル・FAQ・過去案件などの社内文書を学習させ、根拠ある回答を返します。</p>
+          </article>
+          <article class="feature">
+            <span class="f-tag">Automation</span>
+            <p class="f-num">III.</p>
+            <div class="f-visual">
+              <svg viewBox="0 0 120 90" fill="none" aria-hidden="true">
+                <rect x="12" y="34" width="24" height="20" rx="3" stroke="#3ddca8" stroke-width="1.3"/>
+                <rect x="48" y="34" width="24" height="20" rx="3" stroke="#3ddca8" stroke-width="1.3"/>
+                <rect x="84" y="34" width="24" height="20" rx="3" stroke="#3ddca8" stroke-width="1.3"/>
+                <path d="M36 44h12M72 44h12" stroke="#a8efd6" stroke-width="1.3"/>
+                <path d="M44 41l4 3-4 3M80 41l4 3-4 3" stroke="#a8efd6" stroke-width="1.2"/>
+                <path d="M60 54v14H24" stroke="#3ddca8" stroke-width="1" stroke-dasharray="3 4" opacity=".7"/>
+              </svg>
+            </div>
+            <h3>連携と自動化フロー</h3>
+            <p>チャットツールや業務システムと連携し、受信→処理→対応までを自動化します。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== PROCESS ===== -->
+    <section id="process">
+      <div class="wrap">
+        <div class="sec-head rv">
+          <p class="sec-eyebrow"><span class="num">02</span>Process</p>
+          <h2>導入の流れ</h2>
+        </div>
+        <div class="process-list rv">
+          <div class="step"><span class="s-num">01</span><h3>課題ヒアリング</h3><p>自動化したい業務を洗い出します。</p></div>
+          <div class="step"><span class="s-num">02</span><h3>業務設計</h3><p>適用範囲と効果を設計します。</p></div>
+          <div class="step"><span class="s-num">03</span><h3>PoC・検証</h3><p>小さく試し効果を検証します。</p></div>
+          <div class="step"><span class="s-num">04</span><h3>開発・連携</h3><p>既存ツールと連携し実装します。</p></div>
+          <div class="step"><span class="s-num">05</span><h3>運用・改善</h3><p>精度と範囲を継続的に高めます。</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SIGNATURE BAND ===== -->
+    <section class="mx-band">
+      <img src="./assets/img/band-ai.jpg" alt="" decoding="async">
+      <div class="mx-band-in wrap">
+        <p class="mx-band-en">Automation, Elegantly</p>
+        <p class="mx-band-jp">人の時間を、創造へ還す。</p>
+      </div>
+    </section>
+
+    <!-- ===== PRICE ===== -->
+    <section id="price">
+      <div class="wrap">
+        <div class="sec-head rv">
+          <p class="sec-eyebrow"><span class="num">03</span>Price</p>
+          <h2>料金の目安</h2>
+        </div>
+        <div class="price-grid rv">
+          <article class="plan">
+            <h3>PoC（試験導入）</h3>
+            <div class="price">¥500,000<small> 〜</small></div>
+            <p class="p-sub">PROOF OF CONCEPT</p>
+            <ul>
+              <li>1業務での効果検証</li>
+              <li>プロトタイプ構築</li>
+              <li>効果レポート</li>
+            </ul>
+            <a class="btn btn-ghost" href="mailto:iaspira@goatmail.uk?subject=【AIエージェント】PoCの相談">詳しく見る</a>
+          </article>
+          <article class="plan featured">
+            <span class="badge">人気 No.1</span>
+            <h3>標準導入</h3>
+            <div class="price">¥1,500,000<small> 〜</small></div>
+            <p class="p-sub">STANDARD</p>
+            <ul>
+              <li>RAG・社内データ活用</li>
+              <li>既存ツール連携</li>
+              <li>運用設計・社内展開</li>
+            </ul>
+            <a class="btn btn-fill" href="mailto:iaspira@goatmail.uk?subject=【AIエージェント】標準導入の相談">詳しく見る</a>
+          </article>
+          <article class="plan">
+            <h3>フル運用</h3>
+            <div class="price">応相談</div>
+            <p class="p-sub">FULL OPERATION</p>
+            <ul>
+              <li>全社・複数業務の自動化</li>
+              <li>セキュア基盤・権限管理</li>
+              <li>専任サポート体制</li>
+            </ul>
+            <a class="btn btn-ghost" href="mailto:iaspira@goatmail.uk?subject=【AIエージェント】フル運用の相談">詳しく見る</a>
+          </article>
+        </div>
+        <p class="sec-note">※対象業務・データ量・連携範囲により変動します。月額の運用費は別途ご相談ください。</p>
+      </div>
+    </section>
+
+    <!-- ===== WORKS ===== -->
+    <section id="works">
+      <div class="wrap">
+        <div class="sec-head rv">
+          <p class="sec-eyebrow"><span class="num">04</span>Works</p>
+          <h2>導入事例・実績</h2>
+        </div>
+        <div class="works-grid rv">
+          <article class="work">
+            <div class="w-visual has-img"><img class="mx-img" src="./assets/img/ai-1.jpg" alt="問い合わせ対応の自動化（イメージ）" decoding="async">
+              <svg viewBox="0 0 140 130" fill="none" aria-hidden="true">
+                <path d="M30 36h60v34a8 8 0 01-8 8H50l-12 10v-10h-8V36z" stroke="#3ddca8" stroke-width="1.4" transform="translate(8 0)"/>
+                <path d="M52 50h36M52 60h24" stroke="#3ddca8" stroke-width="1" opacity=".7"/>
+                <circle cx="106" cy="92" r="14" stroke="#a8efd6" stroke-width="1.3"/>
+                <path d="M100 92l4 4 8-9" stroke="#a8efd6" stroke-width="1.3"/>
+              </svg>
+            </div>
+            <div class="w-body">
+              <p class="w-cat">Customer Support</p>
+              <h3>問い合わせ対応をAIで自動化</h3>
+              <p>FAQと過去対応を学習したエージェントが、一次対応を無人化。</p>
+              <div class="w-kpi">
+                <div><b>82%</b>自動応答率</div>
+                <div><b>-75%</b>応答時間</div>
+              </div>
+            </div>
+          </article>
+          <article class="work">
+            <div class="w-visual has-img"><img class="mx-img" src="./assets/img/ai-2.jpg" alt="社内ナレッジ検索（イメージ）" decoding="async">
+              <svg viewBox="0 0 140 130" fill="none" aria-hidden="true">
+                <circle cx="62" cy="58" r="26" stroke="#3ddca8" stroke-width="1.4"/>
+                <path d="M80 76l18 18" stroke="#3ddca8" stroke-width="1.4"/>
+                <path d="M52 58h20M52 50h14M52 66h16" stroke="#a8efd6" stroke-width="1.1" opacity=".8"/>
+              </svg>
+            </div>
+            <div class="w-body">
+              <p class="w-cat">社内DX</p>
+              <h3>社内ナレッジ検索で調べる時間を短縮</h3>
+              <p>規程・マニュアルを横断検索できるRAG基盤を構築し、即答を実現。</p>
+              <div class="w-kpi">
+                <div><b>-68%</b>検索時間</div>
+                <div><b>-54%</b>問い合わせ</div>
+              </div>
+            </div>
+          </article>
+          <article class="work">
+            <div class="w-visual has-img"><img class="mx-img" src="./assets/img/ai-3.jpg" alt="営業AIアシスタント（イメージ）" decoding="async">
+              <svg viewBox="0 0 140 130" fill="none" aria-hidden="true">
+                <rect x="28" y="30" width="56" height="40" rx="4" stroke="#3ddca8" stroke-width="1.4"/>
+                <path d="M36 60l12-10 10 7 16-14" stroke="#a8efd6" stroke-width="1.3"/>
+                <path d="M96 44l1.7 4.3 4.3 1.7-4.3 1.7L96 56l-1.7-4.3L90 50l4.3-1.7L96 44z" stroke="#a8efd6" stroke-width="1.1"/>
+                <path d="M40 92h60M40 100h40" stroke="#3ddca8" stroke-width="1" opacity=".6"/>
+              </svg>
+            </div>
+            <div class="w-body">
+              <p class="w-cat">営業・マーケ</p>
+              <h3>営業AIアシスタントで商談を最大化</h3>
+              <p>提案資料の下書きや顧客リサーチをAIが補助し、商談に集中。</p>
+              <div class="w-kpi">
+                <div><b>+46%</b>商談化率</div>
+                <div><b>-58%</b>対応工数</div>
+              </div>
+            </div>
+          </article>
+        </div>
+        <p class="sec-note">※成果は対象業務・データ量により異なります。掲載は一例で、内容はイメージです。</p>
+      </div>
+    </section>
+
+    <!-- ===== VOICE ===== -->
+    <section id="voice">
+      <div class="wrap">
+        <div class="sec-head rv">
+          <p class="sec-eyebrow"><span class="num">05</span>Voice</p>
+          <h2>お客様の声</h2>
+        </div>
+        <div class="voice-grid rv">
+          <article class="voice">
+            <span class="v-mark">“</span>
+            <p>定型の問い合わせ対応をAIに任せ、現場の負担が大きく減りました。PoCから小さく始められた点も安心でした。</p>
+            <div class="v-stars" aria-label="星5つ">
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.4 4.8L18.5 22 12 17.8 5.5 22l1.9-7.7L2 9.5 9 9z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.4 4.8L18.5 22 12 17.8 5.5 22l1.9-7.7L2 9.5 9 9z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.4 4.8L18.5 22 12 17.8 5.5 22l1.9-7.7L2 9.5 9 9z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.4 4.8L18.5 22 12 17.8 5.5 22l1.9-7.7L2 9.5 9 9z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.4 4.8L18.5 22 12 17.8 5.5 22l1.9-7.7L2 9.5 9 9z"/></svg>
+            </div>
+            <div class="v-who"><b>物流｜業務改善ご担当者</b>問い合わせ自動化</div>
+          </article>
+          <article class="voice">
+            <span class="v-mark">“</span>
+            <p>社内ナレッジ検索が速くなり、調べる時間が激減しました。SlackやTeamsともスムーズにつながり助かっています。</p>
+            <div class="v-stars" aria-label="星5つ">
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.4 4.8L18.5 22 12 17.8 5.5 22l1.9-7.7L2 9.5 9 9z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.4 4.8L18.5 22 12 17.8 5.5 22l1.9-7.7L2 9.5 9 9z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.4 4.8L18.5 22 12 17.8 5.5 22l1.9-7.7L2 9.5 9 9z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.4 4.8L18.5 22 12 17.8 5.5 22l1.9-7.7L2 9.5 9 9z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.4 4.8L18.5 22 12 17.8 5.5 22l1.9-7.7L2 9.5 9 9z"/></svg>
+            </div>
+            <div class="v-who"><b>人材サービス｜情報システム</b>社内ナレッジ活用</div>
+          </article>
+          <article class="voice">
+            <span class="v-mark">“</span>
+            <p>レコメンドや資料作成をAIが補助してくれて、少人数でも回せる体制になりました。提案も具体的でした。</p>
+            <div class="v-stars" aria-label="星5つ">
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.4 4.8L18.5 22 12 17.8 5.5 22l1.9-7.7L2 9.5 9 9z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.4 4.8L18.5 22 12 17.8 5.5 22l1.9-7.7L2 9.5 9 9z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.4 4.8L18.5 22 12 17.8 5.5 22l1.9-7.7L2 9.5 9 9z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.4 4.8L18.5 22 12 17.8 5.5 22l1.9-7.7L2 9.5 9 9z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.4 4.8L18.5 22 12 17.8 5.5 22l1.9-7.7L2 9.5 9 9z"/></svg>
+            </div>
+            <div class="v-who"><b>EC｜マーケティング責任者</b>営業・制作の補助</div>
+          </article>
+        </div>
+        <p class="sec-note">※掲載内容はイメージです。実際のお客様の声は順次掲載予定です。</p>
+      </div>
+    </section>
+
+    <!-- ===== CTA ===== -->
+    <section class="cta">
+      <div class="wrap">
+        <div class="cta-in rv">
+          <p class="sec-eyebrow" style="justify-content:center;">Consultation</p>
+          <h2>自動化したい業務を<br>お聞かせください。</h2>
+          <p>現状の課題から、効果の出やすい自動化をご提案します。ご相談・PoCのお見積りは無料です。</p>
+          <div class="hero-ctas">
+            <a class="btn btn-fill" href="mailto:iaspira@goatmail.uk?subject=【AIエージェント】無料相談">無料で相談する</a>
+            <a class="btn btn-line" href="https://lin.ee/VC0YXHV" target="_blank" rel="noopener">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 5.64 2 10.13c0 4.02 3.57 7.39 8.39 8.03.33.07.77.22.89.5.1.26.07.66.03.92l-.14.87c-.04.26-.2 1.02.89.56 1.1-.46 5.91-3.48 8.07-5.96C21.62 13.4 22 11.83 22 10.13 22 5.64 17.52 2 12 2z"/></svg>
+              LINEで相談
+            </a>
+            <a class="btn btn-ghost" href="mailto:iaspira@goatmail.uk?subject=【AIエージェント】資料・お見積り相談">資料・お見積りを相談する</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FAQ ===== -->
+    <section id="faq" style="padding-top:0;">
+      <div class="wrap">
+        <div class="sec-head rv">
+          <p class="sec-eyebrow"><span class="num">06</span>FAQ</p>
+          <h2>よくあるご質問</h2>
+        </div>
+        <div class="faq-list rv">
+          <details><summary><span class="q">Q.</span>導入までどのくらいかかりますか？<span class="plus"></span></summary><p class="a">PoCは最短2〜4週間、本格導入は約1〜3ヶ月が目安です。</p></details>
+          <details><summary><span class="q">Q.</span>社内データのセキュリティは大丈夫ですか？<span class="plus"></span></summary><p class="a">アクセス権限・データ保護に配慮し、要件に応じた構成でセキュアに運用します。</p></details>
+          <details><summary><span class="q">Q.</span>既存のチャットツールと連携できますか？<span class="plus"></span></summary><p class="a">SlackやTeams、各種業務システムとの連携に対応します。</p></details>
+          <details><summary><span class="q">Q.</span>小さく試すことはできますか？<span class="plus"></span></summary><p class="a">はい。PoCで1業務から効果を検証し、段階的に広げられます。</p></details>
+          <details><summary><span class="q">Q.</span>専門知識がなくても運用できますか？<span class="plus"></span></summary><p class="a">運用しやすい管理画面と、社内展開・教育まで含めてサポートします。</p></details>
+          <details><summary><span class="q">Q.</span>どんな業務に向いていますか？<span class="plus"></span></summary><p class="a">問い合わせ対応・社内ヘルプ・資料作成・データ整理など定型業務が得意です。</p></details>
+          <details><summary><span class="q">Q.</span>費用感の目安は？<span class="plus"></span></summary><p class="a">PoCは小規模から、本格導入は対象業務・連携範囲により変動します。まずはご相談ください。</p></details>
+          <details><summary><span class="q">Q.</span>どのAIモデルを使いますか？<span class="plus"></span></summary><p class="a">用途に応じて最適な生成AI・モデルを選定します。社内データに合わせた調整も可能です。</p></details>
+          <details><summary><span class="q">Q.</span>誤回答（ハルシネーション）への対策は？<span class="plus"></span></summary><p class="a">社内データに基づく回答設計や検証フローで、誤りを抑える構成にします。</p></details>
+          <details><summary><span class="q">Q.</span>導入後の改善・運用は？<span class="plus"></span></summary><p class="a">利用ログを基に、精度や対応範囲を継続的に改善します。運用・教育まで伴走します。</p></details>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p class="foot-word" aria-hidden="true">IASPIRA</p>
+      <div class="foot-in">
+        <nav class="foot-links" aria-label="関連ページ">
+          <a href="./index.html">コーポレートトップ</a>
+          <a href="./iaspira-jewelry.html">オーダーメイド宝飾</a>
+          <a href="./iaspira-trade.html">宝飾輸出入</a>
+          <a href="./iaspira-web.html">ホームページ制作</a>
+          <a href="./iaspira-app.html">アプリ開発</a>
+          <a href="./iaspira-ad.html">広告代理店</a>
+        </nav>
+        <p class="copy">© IASPIRA — AI AGENT &amp; AUTOMATION</p>
+      </div>
+    </div>
+  </footer>
+
+  <script type="importmap">
+    { "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    } }
+  </script>
+  <!-- ★差し替え可能ブロック★ Hero 3D（マウント: #neural3d）。ユーザー提供3Dコードに載せ替え可。 -->
+  <script type="module" data-3d="hero-neural-sphere">
+    import * as THREE from 'three';
+
+    const mount = document.getElementById('neural3d');
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    try {
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+      mount.appendChild(renderer.domElement);
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(38, 1, .1, 60);
+      camera.position.set(0, 0, 6.8);
+
+      // ニューラルネットの球体：ノード＋近傍を結ぶエッジ
+      const group = new THREE.Group();
+      const NODES = 110, R = 1.9;
+      const nodePos = [];
+      for (let i = 0; i < NODES; i++) {
+        // フィボナッチ球で均等分布
+        const phi = Math.acos(1 - 2 * (i + .5) / NODES);
+        const theta = Math.PI * (1 + Math.sqrt(5)) * i;
+        nodePos.push(new THREE.Vector3(
+          R * Math.sin(phi) * Math.cos(theta),
+          R * Math.cos(phi),
+          R * Math.sin(phi) * Math.sin(theta)
+        ));
+      }
+      const nGeo = new THREE.BufferGeometry().setFromPoints(nodePos);
+      const nodes = new THREE.Points(nGeo, new THREE.PointsMaterial({
+        color: 0x6fe8c0, size: .055, transparent: true, opacity: .95,
+        blending: THREE.AdditiveBlending, depthWrite: false
+      }));
+      group.add(nodes);
+
+      // 近傍エッジ
+      const edges = [];
+      for (let i = 0; i < NODES; i++) {
+        for (let j = i + 1; j < NODES; j++) {
+          if (nodePos[i].distanceTo(nodePos[j]) < .75) { edges.push(nodePos[i], nodePos[j]); }
+        }
+      }
+      const eGeo = new THREE.BufferGeometry().setFromPoints(edges);
+      const lines = new THREE.LineSegments(eGeo, new THREE.LineBasicMaterial({
+        color: 0x3ddca8, transparent: true, opacity: .28
+      }));
+      group.add(lines);
+
+      // 内核（思考のコア）
+      const core = new THREE.Mesh(
+        new THREE.IcosahedronGeometry(.62, 1),
+        new THREE.MeshBasicMaterial({ color: 0x16b8d8, wireframe: true, transparent: true, opacity: .6 })
+      );
+      group.add(core);
+      const coreGlow = new THREE.Mesh(
+        new THREE.SphereGeometry(.4, 20, 20),
+        new THREE.MeshBasicMaterial({ color: 0x6fe8c0, transparent: true, opacity: .32 })
+      );
+      group.add(coreGlow);
+      scene.add(group);
+
+      // 信号パルス（ノード間を走る光点）
+      const pulses = [];
+      for (let i = 0; i < 7; i++) {
+        const m = new THREE.Mesh(new THREE.SphereGeometry(.045, 8, 8),
+          new THREE.MeshBasicMaterial({ color: 0xd8fff0 }));
+        const a = nodePos[Math.floor(Math.random() * NODES)];
+        const b = nodePos[Math.floor(Math.random() * NODES)];
+        pulses.push({ m, a, b, t: Math.random() });
+        group.add(m);
+      }
+
+      // 外周の微粒子
+      const N = 220, pos = new Float32Array(N * 3);
+      for (let i = 0; i < N; i++) {
+        const r = 2.6 + Math.random() * 3, t = Math.random() * Math.PI * 2, p = Math.acos(2 * Math.random() - 1);
+        pos[i*3] = r * Math.sin(p) * Math.cos(t);
+        pos[i*3+1] = r * Math.cos(p) * .8;
+        pos[i*3+2] = r * Math.sin(p) * Math.sin(t);
+      }
+      const pgeo = new THREE.BufferGeometry();
+      pgeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      const dust = new THREE.Points(pgeo, new THREE.PointsMaterial({
+        color: 0xc8f5e4, size: .022, transparent: true, opacity: .6,
+        blending: THREE.AdditiveBlending, depthWrite: false
+      }));
+      scene.add(dust);
+
+      let mx = 0, my = 0;
+      addEventListener('pointermove', e => {
+        mx = (e.clientX / innerWidth - .5) * 2;
+        my = (e.clientY / innerHeight - .5) * 2;
+      }, { passive: true });
+
+      function resize() {
+        const w = mount.clientWidth, h = mount.clientHeight;
+        renderer.setSize(w, h);
+        camera.aspect = w / h; camera.updateProjectionMatrix();
+      }
+      new ResizeObserver(resize).observe(mount);
+      resize();
+
+      const clock = new THREE.Clock();
+      renderer.setAnimationLoop(() => {
+        const t = clock.getElapsedTime();
+        if (!reduced) {
+          group.rotation.y = t * .16;
+          group.rotation.x = Math.sin(t * .3) * .12;
+          core.rotation.y = -t * .5;
+          coreGlow.scale.setScalar(1 + Math.sin(t * 2.2) * .14);
+          for (const p of pulses) {
+            p.t += .008;
+            if (p.t >= 1) { p.t = 0; p.a = p.b; p.b = nodePos[Math.floor(Math.random() * NODES)]; }
+            p.m.position.lerpVectors(p.a, p.b, p.t);
+          }
+          dust.rotation.y = -t * .03;
+        }
+        group.rotation.x += (my * .15 - group.rotation.x) * .03;
+        group.rotation.z += (mx * .08 - group.rotation.z) * .03;
+        renderer.render(scene, camera);
+      });
+      if (reduced) { renderer.render(scene, camera); renderer.setAnimationLoop(null); }
+    } catch (e) { /* WebGL不可ならグラデ背景のまま */ }
+  </script>
+
+  <script>
+    const nav = document.getElementById('nav');
+    addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 40), { passive: true });
+    const io = new IntersectionObserver(es => es.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    }), { threshold: .12 });
+    document.querySelectorAll('.rv').forEach(el => io.observe(el));
+  </script>
+  <script type="module" src="./assets/iaspira-motion.js?v=20260707h"></script>
+</body>
+</html>

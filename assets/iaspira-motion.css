@@ -1,0 +1,198 @@
+/* ============================================================
+   IASPIRA motion layer — OBSIDIAN ATELIER enhancement (2026-07-07)
+   全7ページ共通。assets/iaspira-motion.js（motion.dev CDN）と対。
+   JS無効時は何も壊さない（プログレッシブエンハンスメント）。
+   ============================================================ */
+
+/* JS層が起動したら（html.mx）、旧 .rv コンテナ一括リビールを無効化し、
+   子要素stagger側に演出を引き継ぐ */
+html.mx .rv { opacity: 1 !important; transform: none !important; transition: none !important; }
+
+/* ヒーローの初期チラつき防止（JS起動前の一瞬だけ隠す。CDN失敗時は1.4秒で自動解除） */
+html.mx-pre .hero-in > *, html.mx-pre .tate, html.mx-pre .scroll-cue { opacity: 0; }
+
+/* ---- ページ進捗ライン ---- */
+.mx-progress {
+  position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 90;
+  transform: scaleX(0); transform-origin: 0 50%;
+  background: var(--grad-acc); box-shadow: 0 0 14px var(--acc-dim);
+  pointer-events: none;
+}
+
+/* ---- 発光カーソル（fine pointer のみ） ---- */
+.mx-dot, .mx-ring { position: fixed; top: 0; left: 0; border-radius: 50%; pointer-events: none; z-index: 220; opacity: 0; }
+.mx-dot { width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px; background: var(--acc); box-shadow: 0 0 10px var(--acc-dim); }
+.mx-ring {
+  width: 34px; height: 34px; margin: -17px 0 0 -17px;
+  border: 1px solid var(--acc-dim);
+  transition: width .35s cubic-bezier(.2,.7,.2,1), height .35s cubic-bezier(.2,.7,.2,1),
+              margin .35s cubic-bezier(.2,.7,.2,1), background-color .35s ease, border-color .35s ease;
+}
+.mx-ring.is-link { width: 58px; height: 58px; margin: -29px 0 0 -29px; background: rgb(217 189 142 / 8%); border-color: var(--acc); }
+@media (hover: none), (pointer: coarse) { .mx-dot, .mx-ring { display: none; } }
+html.mx-r .mx-dot, html.mx-r .mx-ring { display: none; }
+
+/* ---- ヒーロー見出しの文字マスク ---- */
+.mx-w { display: inline-block; overflow: hidden; vertical-align: bottom; }
+.mx-wi { display: inline-block; transform: translateY(112%); will-change: transform; }
+html.mx-r .mx-wi { transform: none; }
+
+/* ---- eyebrow 罫線ドロー ---- */
+html.mx .sec-eyebrow::after { transform: scaleX(0); transform-origin: left center; transition: transform 1.1s cubic-bezier(.2,.7,.2,1) .15s; }
+html.mx .mx-in .sec-eyebrow::after { transform: scaleX(1); }
+html.mx .hero-eyebrow::before { transform: scaleX(0); transform-origin: left center; transition: transform 1s cubic-bezier(.2,.7,.2,1) .25s; }
+html.mx .hero.mx-in .hero-eyebrow::before { transform: scaleX(1); }
+html.mx-r .sec-eyebrow::after, html.mx-r .hero-eyebrow::before { transform: scaleX(1); }
+
+/* ---- CTA：磁気ホバー＋光沢スイープ ---- */
+/* transform は JS（磁気）が所有するので transition から外す */
+html.mx .btn { transition: border-color .35s ease, background-color .35s ease, box-shadow .35s ease, color .3s ease; }
+.btn::after {
+  content: ""; position: absolute; top: 0; bottom: 0; left: -70%; width: 45%;
+  background: linear-gradient(100deg, transparent, rgb(255 255 255 / 22%), transparent);
+  transform: skewX(-18deg); transition: left .7s ease; pointer-events: none;
+}
+.btn:hover::after { left: 130%; }
+
+/* ---- ナビ：下スクロールで格納、上スクロールで復帰 ---- */
+/* 既存バグ修正: 各ページの `header.nav { position: relative }`(0011) が
+   `.nav { position: fixed }`(0010) に勝って追従ナビが無効化されていた。
+   ここで同詳細度・後勝ちで fixed を復元する（.scrolled のガラス背景や
+   格納演出は fixed 前提で書かれている）。 */
+header.nav { position: fixed; }
+html.mx .nav { transition: transform .55s cubic-bezier(.2,.7,.2,1), background .4s ease, border-color .4s ease; }
+html.mx .nav.mx-hide { transform: translateY(-100%); }
+
+/* ---- 画像スロット（Works / Case） ---- */
+.w-visual.has-img, .case.has-img { position: relative; overflow: hidden; padding: 0; }
+.has-img > svg { display: none; }
+.w-visual.has-img img, .case.has-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.w-visual.has-img::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgb(10 10 16 / 8%) 0%, transparent 40%, rgb(10 10 16 / 45%) 100%);
+}
+.case.has-img { border-style: solid; height: 230px; justify-content: flex-end; align-items: flex-start; padding: 22px 24px; gap: 6px; }
+.case.has-img::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgb(10 10 16 / 10%), rgb(10 10 16 / 78%));
+}
+.case.has-img .c-tag, .case.has-img .c-label { position: relative; z-index: 2; }
+.case.has-img .c-label { color: var(--ink); }
+
+/* ---- シグネチャーバンド（全幅パララックス画像帯） ---- */
+.mx-band {
+  position: relative; height: 54vh; min-height: 340px; max-height: 620px;
+  padding: 0; overflow: hidden;
+  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  display: flex; align-items: flex-end;
+}
+.mx-band > img {
+  position: absolute; top: -9%; left: 0; width: 100%; height: 118%;
+  object-fit: cover; will-change: transform;
+}
+.mx-band::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background:
+    linear-gradient(180deg, var(--bg) 0%, transparent 26% 56%, rgb(0 0 0 / 72%) 100%),
+    linear-gradient(100deg, rgb(0 0 0 / 45%), transparent 55%);
+}
+.mx-band-in { position: relative; z-index: 2; padding-bottom: 52px; }
+.mx-band-en {
+  font-family: var(--display); font-style: italic; font-size: 13px;
+  letter-spacing: .42em; color: var(--acc); text-transform: uppercase;
+  display: flex; align-items: center; gap: 16px; margin: 0 0 14px;
+  text-shadow: 0 1px 14px rgb(0 0 0 / 80%);
+}
+.mx-band-en::before { content: ""; width: 44px; height: 1px; background: var(--acc-dim); }
+.mx-band-jp {
+  font-family: var(--mincho); font-weight: 600; letter-spacing: .08em;
+  font-size: clamp(20px, 2.6vw, 30px); line-height: 1.7; color: var(--ink); margin: 0;
+  text-shadow: 0 2px 24px rgb(0 0 0 / 60%);
+}
+@media (max-width: 640px) { .mx-band { height: 42vh; min-height: 260px; } }
+
+/* ---- カード3Dチルト（transformはJS所有。CSS側hover transformを無効化） ---- */
+html.mx-tilt .svc:hover, html.mx-tilt .work:hover, html.mx-tilt .feature:hover,
+html.mx-tilt .plan:hover, html.mx-tilt .why:hover, html.mx-tilt .case:hover { transform: none; }
+
+/* ---- ブランドイントロ（セッション初回のみ・CSS駆動で自走完結） ---- */
+.mx-intro {
+  position: fixed; inset: 0; z-index: 300; background: #07070c;
+  display: flex; align-items: center; justify-content: center;
+  animation: mx-intro-leave .9s cubic-bezier(.76, 0, .24, 1) 1.45s forwards;
+}
+.mx-intro .w {
+  font-family: var(--display); font-weight: 500; color: var(--ink);
+  font-size: clamp(28px, 4vw, 44px); text-indent: .3em;
+  animation: mx-intro-word 1.4s cubic-bezier(.2, .7, .2, 1) both;
+  position: relative;
+}
+.mx-intro .w::after {
+  content: ""; position: absolute; left: 15%; right: 15%; bottom: -18px; height: 1px;
+  background: var(--grad-acc, linear-gradient(90deg, transparent, #d9bd8e, transparent));
+  transform: scaleX(0); animation: mx-intro-line .9s cubic-bezier(.2, .7, .2, 1) .5s forwards;
+}
+@keyframes mx-intro-word { from { opacity: 0; letter-spacing: .06em; } 35% { opacity: 1; } to { opacity: 1; letter-spacing: .34em; } }
+@keyframes mx-intro-line { to { transform: scaleX(1); } }
+@keyframes mx-intro-leave { to { transform: translateY(-101%); } }
+
+/* ---- ページ間トランジション（View Transitions API・対応ブラウザのみ漸進強化） ---- */
+@view-transition { navigation: auto; }
+::view-transition-old(root) { animation: mx-vt-out .3s ease both; }
+::view-transition-new(root) { animation: mx-vt-in .55s cubic-bezier(.2, .7, .2, 1) both; }
+@keyframes mx-vt-out { to { opacity: 0; } }
+@keyframes mx-vt-in { from { opacity: 0; transform: translateY(14px); } }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+  .mx-intro { display: none; }
+}
+
+/* ---- セクションレール（右端の現在地ナビ・デスクトップのみ） ---- */
+.mx-rail {
+  position: fixed; right: 30px; top: 50%; transform: translateY(-50%); z-index: 80;
+  display: grid; gap: 18px; opacity: 0; pointer-events: none;
+  transition: opacity .6s ease;
+}
+.mx-rail.show { opacity: 1; pointer-events: auto; }
+.mx-rail a { position: relative; width: 9px; height: 9px; display: block; }
+.mx-rail a i {
+  position: absolute; inset: 1px; border: 1px solid var(--faint);
+  transform: rotate(45deg); transition: background .3s, border-color .3s, box-shadow .3s;
+}
+.mx-rail a:hover i, .mx-rail a.on i {
+  background: var(--acc); border-color: var(--acc); box-shadow: 0 0 10px var(--acc-dim);
+}
+.mx-rail a .tip {
+  position: absolute; right: 22px; top: 50%; transform: translateY(-50%) translateX(6px);
+  font-family: var(--display); font-style: italic; font-size: 10.5px;
+  letter-spacing: .26em; text-transform: uppercase; color: var(--sub);
+  white-space: nowrap; opacity: 0; transition: opacity .3s, transform .3s; pointer-events: none;
+}
+.mx-rail a:hover .tip { opacity: 1; transform: translateY(-50%) translateX(0); }
+@media (max-width: 1120px) { .mx-rail { display: none; } }
+html.mx-r .mx-rail { display: none; }
+
+/* ---- 微調整：実績数字のゴールドグラデ／Works画像ホバーズーム／スクロールバー ---- */
+.stat .num {
+  background: linear-gradient(115deg, var(--acc), color-mix(in srgb, var(--acc) 45%, #fff));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+html.mx .w-visual img { transition: transform .8s cubic-bezier(.2, .7, .2, 1); }
+html.mx .work:hover .w-visual img { transform: scale(1.06); }
+html { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--acc) 35%, transparent) transparent; }
+::-webkit-scrollbar { width: 11px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--acc) 30%, transparent);
+  border-radius: 6px; border: 3px solid transparent; background-clip: content-box;
+}
+
+/* Lenis有効時はネイティブsmoothを無効化（二重スムージング防止） */
+html.mx-lenis { scroll-behavior: auto; }
+
+/* reduced-motion：全演出を確実に停止（保険） */
+@media (prefers-reduced-motion: reduce) {
+  .mx-progress { display: none; }
+  .btn::after { display: none; }
+  html .nav.mx-hide { transform: none; }
+}

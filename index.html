@@ -1,0 +1,685 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IASPIRA | 宝飾とデジタルをつなぐ事業支援</title>
+  <meta name="description" content="IASPIRAは、宝飾作成・輸出入、ホームページ制作、アプリ開発、FX領域の広告支援、AIエージェント構築を横断して支援します。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Shippori+Mincho:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a10;
+      --bg-2: #11101a;
+      --ink: #f4f1ea;
+      --sub: #bcb7c4;
+      --faint: #847f91;
+      --line: rgb(244 241 234 / 10%);
+      --line-strong: rgb(244 241 234 / 18%);
+      --glass: rgb(255 255 255 / 3.5%);
+      --glass-2: rgb(255 255 255 / 6%);
+      --acc: #d9bd8e;
+      --acc-dim: rgb(217 189 142 / 45%);
+      --grad-acc: linear-gradient(115deg, #efd292, #b98e4e);
+      /* 事業色トークン */
+      --c-jewelry: #f0a3d4;
+      --c-trade: #e3b964;
+      --c-web: #5aa8ff;
+      --c-app: #9d8cff;
+      --c-ad: #f0a35c;
+      --c-ai: #3ddca8;
+      --display: "Cormorant Garamond", "Shippori Mincho", serif;
+      --mincho: "Shippori Mincho", ui-serif, serif;
+      --gothic: "Zen Kaku Gothic New", "Hiragino Sans", sans-serif;
+      --max: 1180px;
+      --r: 4px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; background: var(--bg); color: var(--ink);
+      font-family: var(--gothic); font-size: 16px; line-height: 1.95;
+      letter-spacing: .02em; -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility; overflow-x: hidden;
+    }
+    ::selection { background: rgb(217 189 142 / 26%); }
+    a { color: inherit; text-decoration: none; }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--acc); outline-offset: 3px; border-radius: var(--r); }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+      .rv { opacity: 1 !important; transform: none !important; }
+    }
+    .wrap { width: min(var(--max), calc(100% - 48px)); margin: 0 auto; }
+
+    .atmosphere {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 70rem 44rem at 76% -8%, rgb(217 189 142 / 9%), transparent 60%),
+        radial-gradient(ellipse 50rem 36rem at 4% 30%, rgb(157 140 255 / 7%), transparent 62%),
+        radial-gradient(ellipse 56rem 44rem at 94% 88%, rgb(240 163 212 / 6%), transparent 60%);
+    }
+    .atmosphere::after {
+      content: ""; position: absolute; inset: 0; opacity: .5;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    main, header.nav, footer { position: relative; z-index: 1; }
+
+    .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 50; border-bottom: 1px solid transparent; transition: background .4s ease, border-color .4s ease; }
+    .nav.scrolled { background: rgb(10 10 16 / 78%); backdrop-filter: blur(18px) saturate(1.1); border-bottom-color: var(--line); }
+    .nav-in { display: flex; align-items: center; gap: 28px; height: 78px; }
+    .brand { display: flex; align-items: baseline; gap: 14px; margin-right: auto; }
+    .brand .mark { font-family: var(--display); font-weight: 500; font-size: 24px; letter-spacing: .3em; color: var(--ink); }
+    .brand .sub { font-size: 10px; letter-spacing: .32em; color: var(--acc-dim); text-transform: uppercase; }
+    .nav-links { display: flex; gap: 30px; font-size: 13px; letter-spacing: .08em; }
+    .nav-links a { color: var(--sub); transition: color .3s; position: relative; padding: 4px 0; }
+    .nav-links a::after { content: ""; position: absolute; left: 0; bottom: 0; width: 0; height: 1px; background: var(--acc); transition: width .35s ease; }
+    .nav-links a:hover { color: var(--ink); }
+    .nav-links a:hover::after { width: 100%; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 14px 30px; border-radius: 999px; font-size: 14px; font-weight: 500;
+      letter-spacing: .1em; cursor: pointer; transition: all .35s ease;
+      border: 1px solid var(--line-strong); position: relative; overflow: hidden;
+      white-space: nowrap;
+    }
+    .btn-fill { background: var(--grad-acc); color: #1a1206; border-color: transparent; font-weight: 700; box-shadow: 0 8px 32px rgb(217 189 142 / 22%); }
+    .btn-fill:hover { transform: translateY(-2px); box-shadow: 0 14px 44px rgb(217 189 142 / 34%); }
+    .btn-ghost { color: var(--ink); background: rgb(255 255 255 / 3%); }
+    .btn-ghost:hover { border-color: var(--acc-dim); background: rgb(255 255 255 / 6%); transform: translateY(-2px); }
+    .btn-line { color: #9fe8b8; border-color: rgb(6 199 85 / 40%); background: rgb(6 199 85 / 7%); }
+    .btn-line:hover { background: rgb(6 199 85 / 14%); transform: translateY(-2px); }
+    .btn-nav { padding: 11px 24px; font-size: 12.5px; }
+    @media (max-width: 900px) { .nav-links { display: none; } }
+    @media (max-width: 620px) {
+      .brand .sub { display: none; }
+      .btn-nav { padding: 10px 16px; font-size: 11.5px; letter-spacing: .06em; }
+    }
+
+    /* ===== HERO ===== */
+    .hero { position: relative; min-height: 100svh; display: flex; align-items: center; padding: 130px 0 80px; }
+    #constellation3d { position: absolute; inset: 0; z-index: 0; }
+    #constellation3d canvas { display: block; }
+    .hero-in { position: relative; z-index: 2; max-width: 760px; }
+    .hero-eyebrow {
+      display: flex; align-items: center; gap: 16px;
+      font-family: var(--display); font-style: italic; font-size: 15px;
+      letter-spacing: .42em; color: var(--acc); text-transform: uppercase; margin-bottom: 34px;
+    }
+    .hero-eyebrow::before { content: ""; width: 56px; height: 1px; background: var(--acc-dim); }
+    h1 { font-family: var(--mincho); font-weight: 600; font-size: clamp(32px, 4.4vw, 58px); line-height: 1.5; letter-spacing: .055em; margin: 0 0 30px; }
+    h1 .accent { background: var(--grad-acc); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .hero-lead { color: var(--sub); font-size: 16.5px; line-height: 2.15; margin: 0 0 44px; max-width: 36em; }
+    .hero-ctas { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 40px; }
+    .hero-note { font-size: 12.5px; letter-spacing: .12em; color: var(--faint); }
+    .tate {
+      position: absolute; right: 38px; top: 50%; transform: translateY(-50%);
+      writing-mode: vertical-rl; z-index: 3;
+      font-family: var(--mincho); font-size: 13px; letter-spacing: .6em; color: var(--faint);
+      border-right: 1px solid var(--line); padding-right: 18px;
+    }
+    .scroll-cue {
+      position: absolute; bottom: 38px; left: 50%; transform: translateX(-50%);
+      font-size: 10px; letter-spacing: .4em; color: var(--faint); z-index: 3;
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+    }
+    .scroll-cue::after { content: ""; width: 1px; height: 46px; background: linear-gradient(180deg, var(--acc-dim), transparent); animation: cue 2.4s ease infinite; }
+    @keyframes cue { 0% { transform: scaleY(0); transform-origin: top; } 55% { transform: scaleY(1); transform-origin: top; } 56% { transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
+    @media (max-height: 880px) { .scroll-cue { display: none; } }
+    @media (max-width: 900px) { .tate { display: none; } }
+
+    section { padding: 110px 0; position: relative; }
+    .sec-head { margin-bottom: 64px; }
+    .sec-eyebrow {
+      display: flex; align-items: center; gap: 16px;
+      font-family: var(--display); font-style: italic; font-size: 13px;
+      letter-spacing: .42em; color: var(--acc); text-transform: uppercase; margin-bottom: 22px;
+    }
+    .sec-eyebrow .num { font-style: normal; color: var(--faint); letter-spacing: .2em; }
+    .sec-eyebrow::after { content: ""; flex: 1; max-width: 120px; height: 1px; background: var(--line-strong); }
+    h2 { font-family: var(--mincho); font-weight: 600; font-size: clamp(26px, 3.4vw, 40px); line-height: 1.6; letter-spacing: .05em; margin: 0; }
+    .sec-lead { color: var(--sub); font-size: 15.5px; max-width: 44em; margin: 24px 0 0; }
+    .rv { opacity: 0; transform: translateY(28px); transition: opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1); }
+    .rv.in { opacity: 1; transform: none; }
+
+    /* ===== SERVICES ===== */
+    .svc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+    .svc {
+      --c: var(--acc);
+      border: 1px solid var(--line); background: var(--glass);
+      padding: 42px 34px 36px; position: relative; overflow: hidden;
+      display: flex; flex-direction: column;
+      transition: transform .4s ease, border-color .4s ease, background .4s ease;
+    }
+    .svc::before {
+      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--c), transparent);
+      opacity: .55; transition: opacity .4s ease;
+    }
+    .svc:hover { transform: translateY(-6px); border-color: color-mix(in srgb, var(--c) 45%, transparent); background: var(--glass-2); }
+    .svc:hover::before { opacity: 1; }
+    .svc .s-glyph {
+      width: 54px; height: 54px; margin-bottom: 26px;
+      display: flex; align-items: center; justify-content: center;
+      border: 1px solid color-mix(in srgb, var(--c) 40%, transparent);
+      background: color-mix(in srgb, var(--c) 8%, transparent);
+      transform: rotate(45deg);
+    }
+    .svc .s-glyph svg { width: 24px; height: 24px; stroke: var(--c); transform: rotate(-45deg); }
+    .svc .s-en { font-family: var(--display); font-style: italic; font-size: 12px; letter-spacing: .3em; color: var(--c); text-transform: uppercase; margin-bottom: 8px; }
+    .svc h3 { font-family: var(--mincho); font-size: 21px; font-weight: 600; letter-spacing: .08em; margin: 0 0 14px; }
+    .svc > p { color: var(--sub); font-size: 14px; margin: 0 0 20px; }
+    .svc ul { list-style: none; margin: 0 0 28px; padding: 0; display: grid; gap: 9px; flex: 1; }
+    .svc li { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--sub); }
+    .svc li::before { content: ""; flex: none; width: 5px; height: 5px; margin-top: 10px; background: var(--c); transform: rotate(45deg); }
+    .svc .s-link {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: 13px; letter-spacing: .14em; color: var(--ink);
+      border-top: 1px solid var(--line); padding-top: 20px;
+      transition: color .3s, gap .3s;
+    }
+    .svc .s-link::after { content: "→"; color: var(--c); transition: transform .3s; }
+    .svc .s-link:hover { color: var(--c); }
+    .svc .s-link:hover::after { transform: translateX(5px); }
+    @media (max-width: 980px) { .svc-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 640px) { .svc-grid { grid-template-columns: 1fr; } }
+
+    /* ===== WHY ===== */
+    .why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+    .why { background: var(--bg); padding: 52px 38px 48px; transition: background .5s ease; }
+    .why:hover { background: var(--bg-2); }
+    .why .w-num { font-family: var(--display); font-style: italic; font-size: 40px; color: var(--acc-dim); line-height: 1; margin-bottom: 24px; }
+    .why h3 { font-family: var(--mincho); font-size: 20px; font-weight: 600; letter-spacing: .06em; margin: 0 0 14px; }
+    .why p { color: var(--sub); font-size: 14.5px; margin: 0; }
+    @media (max-width: 900px) { .why-grid { grid-template-columns: 1fr; } }
+
+    /* ===== PROCESS ===== */
+    .process-list { display: grid; gap: 0; border-top: 1px solid var(--line); }
+    .step {
+      display: grid; grid-template-columns: 130px 280px 1fr; gap: 28px;
+      align-items: baseline; padding: 40px 8px; border-bottom: 1px solid var(--line);
+      transition: background .4s ease, padding-left .4s ease;
+    }
+    .step:hover { background: rgb(255 255 255 / 2%); padding-left: 20px; }
+    .step .s-num { font-family: var(--display); font-style: italic; font-weight: 400; font-size: 42px; color: var(--acc-dim); line-height: 1; }
+    .step h3 { font-family: var(--mincho); font-size: 21px; font-weight: 600; letter-spacing: .08em; margin: 0; }
+    .step p { color: var(--sub); font-size: 14.5px; margin: 0; }
+    @media (max-width: 820px) {
+      .step { grid-template-columns: 64px 1fr; }
+      .step p { grid-column: 2; }
+    }
+
+    /* ===== CASE SPACE ===== */
+    .case-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+    .case {
+      border: 1px dashed var(--line-strong); background: var(--glass);
+      height: 230px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+      color: var(--faint); transition: border-color .4s ease;
+    }
+    .case:hover { border-color: var(--acc-dim); }
+    .case .c-tag { font-family: var(--display); font-style: italic; font-size: 12px; letter-spacing: .32em; color: var(--acc); text-transform: uppercase; }
+    .case .c-label { font-size: 13px; letter-spacing: .14em; }
+    .case svg { width: 36px; height: 36px; stroke: var(--faint); opacity: .8; }
+    @media (max-width: 900px) { .case-grid { grid-template-columns: 1fr; } }
+
+    /* ===== CONTACT ===== */
+    .contact { padding: 130px 0; }
+    .contact-in {
+      border: 1px solid var(--acc-dim); position: relative;
+      padding: 80px 56px; overflow: hidden;
+      background:
+        radial-gradient(ellipse 40rem 22rem at 50% 130%, rgb(217 189 142 / 11%), transparent 65%),
+        var(--glass);
+      display: grid; grid-template-columns: 1.1fr .9fr; gap: 56px;
+    }
+    .contact-in::before, .contact-in::after { content: ""; position: absolute; width: 56px; height: 56px; pointer-events: none; }
+    .contact-in::before { top: 14px; left: 14px; border-top: 1px solid var(--acc); border-left: 1px solid var(--acc); }
+    .contact-in::after { bottom: 14px; right: 14px; border-bottom: 1px solid var(--acc); border-right: 1px solid var(--acc); }
+    .contact h2 { margin-bottom: 22px; }
+    .contact p { color: var(--sub); margin: 0 0 40px; }
+    .contact .hero-ctas { margin-bottom: 0; }
+    .c-info { display: grid; gap: 0; align-content: center; border-left: 1px solid var(--line); padding-left: 56px; }
+    .c-row { padding: 18px 0; border-bottom: 1px solid var(--line); }
+    .c-row:last-child { border-bottom: 0; }
+    .c-row .k { font-family: var(--display); font-style: italic; font-size: 12px; letter-spacing: .3em; color: var(--acc); text-transform: uppercase; margin-bottom: 4px; }
+    .c-row .v { font-size: 14.5px; letter-spacing: .04em; }
+    @media (max-width: 900px) {
+      .contact-in { grid-template-columns: 1fr; padding: 60px 28px; }
+      .c-info { border-left: 0; padding-left: 0; border-top: 1px solid var(--line); padding-top: 24px; }
+    }
+
+    footer { border-top: 1px solid var(--line); padding: 80px 0 46px; overflow: hidden; }
+    .foot-word {
+      font-family: var(--display); font-weight: 400; letter-spacing: .22em;
+      font-size: clamp(60px, 11vw, 150px); line-height: 1; text-align: center;
+      color: transparent; -webkit-text-stroke: 1px rgb(244 241 234 / 13%);
+      user-select: none; margin-bottom: 60px;
+    }
+    .foot-in { display: flex; flex-wrap: wrap; gap: 28px; align-items: center; justify-content: space-between; }
+    .foot-links { display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 12px; color: var(--faint); }
+    .foot-links a:hover { color: var(--acc); }
+    .copy { font-size: 11px; letter-spacing: .2em; color: var(--faint); }
+  </style>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 3h12l4 6-10 12L2 9l4-6z' fill='%23d9bd8e'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./assets/iaspira-motion.css?v=20260707h">
+</head>
+<body>
+  <script>(function(){var d=document,c=d.documentElement.classList;if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;c.add("mx-pre");setTimeout(function(){c.remove("mx-pre")},1400);var seen=null;try{seen=sessionStorage.getItem("mxIntro");sessionStorage.setItem("mxIntro","1")}catch(e){}if(!seen){var o=d.createElement("div");o.className="mx-intro";o.innerHTML='<span class="w">IASPIRA</span>';d.body.appendChild(o);o.addEventListener("animationend",function(e){if(e.animationName==="mx-intro-leave")o.remove()});setTimeout(function(){o.parentNode&&o.remove()},3400);}})();</script>
+  <div class="atmosphere" aria-hidden="true"></div>
+
+  <header class="nav" id="nav">
+    <div class="wrap nav-in">
+      <a class="brand" href="#top">
+        <span class="mark">IASPIRA</span>
+        <span class="sub">Jewelry / Trade / Digital</span>
+      </a>
+      <nav class="nav-links" aria-label="ページ内ナビゲーション">
+        <a href="#services">サービス</a>
+        <a href="#why">強み</a>
+        <a href="#process">進め方</a>
+        <a href="#contact">相談する</a>
+      </nav>
+      <a class="btn btn-fill btn-nav" href="mailto:iaspira@goatmail.uk?subject=【IASPIRA】事業相談">事業相談をする</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- ===== HERO ===== -->
+    <section class="hero" id="top">
+      <div id="constellation3d" aria-hidden="true"></div>
+      <div class="wrap">
+        <div class="hero-in">
+          <p class="hero-eyebrow">Jewelry / Global Trade / AI Growth Partner</p>
+          <h1>宝飾とデジタルを、<br><span class="accent">事業の推進力</span>へ。</h1>
+          <p class="hero-lead">IASPIRAは、オーダーメイド宝飾・輸出入から、ホームページ制作、アプリ開発、広告支援、AIエージェント構築までを横断する事業支援会社です。美意識、実装力、多言語対応を組み合わせ、次の一手を速く、上質に形にします。</p>
+          <div class="hero-ctas">
+            <a class="btn btn-fill" href="mailto:iaspira@goatmail.uk?subject=【IASPIRA】事業相談">事業相談をする</a>
+            <a class="btn btn-line" href="https://lin.ee/VC0YXHV" target="_blank" rel="noopener">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 5.64 2 10.13c0 4.02 3.57 7.39 8.39 8.03.33.07.77.22.89.5.1.26.07.66.03.92l-.14.87c-.04.26-.2 1.02.89.56 1.1-.46 5.91-3.48 8.07-5.96C21.62 13.4 22 11.83 22 10.13 22 5.64 17.52 2 12 2z"/></svg>
+              LINEで相談
+            </a>
+            <a class="btn btn-ghost" href="#services">サービスを見る</a>
+          </div>
+          <p class="hero-note">オンライン相談対応 / 日本語・英語・中国語を中心に対応</p>
+        </div>
+      </div>
+      <p class="tate" aria-hidden="true">美しさと、実装力を。</p>
+      <div class="scroll-cue" aria-hidden="true">SCROLL</div>
+    </section>
+
+    <!-- ===== WHAT WE DO ===== -->
+    <section id="about" style="padding-bottom:40px;">
+      <div class="wrap">
+        <div class="sec-head rv" style="margin-bottom:0;">
+          <p class="sec-eyebrow"><span class="num">01</span>What We Do</p>
+          <h2>美しさを扱う感性と、事業を動かす技術。</h2>
+          <p class="sec-lead">IASPIRAの役割は、単一の制作会社や広告代理店に留まりません。商品・素材・言語・顧客導線・業務プロセスを見渡し、必要なチームと技術を組み合わせて、事業の実行速度を上げることです。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SERVICES ===== -->
+    <section id="services">
+      <div class="wrap">
+        <div class="sec-head rv">
+          <p class="sec-eyebrow"><span class="num">02</span>Services</p>
+          <h2>依頼できることを、明確に。</h2>
+          <p class="sec-lead">構想段階の相談から、制作・改善・運用まで。各領域を独立して依頼でき、必要に応じて横断プロジェクトとして組み立てられます。</p>
+        </div>
+        <div class="svc-grid rv">
+          <article class="svc" style="--c: var(--c-jewelry);">
+            <div class="s-glyph"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M6 3h12l4 6-10 12L2 9l4-6z"/><path d="M6 3l3 6 3-6m0 0l3 6 3-6M2 9h20"/></svg></div>
+            <p class="s-en">Order-Made Jewelry</p>
+            <h3>宝飾作成</h3>
+            <p>オンラインで相談から進められるオーダーメイド宝飾。AIを活用した3Dデザイン提案で、完成イメージを丁寧に共有します。</p>
+            <ul>
+              <li>オンラインオーダーメイド対応</li>
+              <li>AIを利用した3Dデザイン提案</li>
+              <li>納期目安は約1ヶ月半</li>
+              <li>英語・中国語対応</li>
+            </ul>
+            <a class="s-link" href="./iaspira-jewelry.html">宝飾作成のホームページ</a>
+          </article>
+          <article class="svc" style="--c: var(--c-trade);">
+            <div class="s-glyph"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.6 3 14.4 0 18-3-3.6-3-14.4 0-18z"/></svg></div>
+            <p class="s-en">Jewelry Trade</p>
+            <h3>宝飾輸出入</h3>
+            <p>多様な素材・調達先を扱い、海外取引先とのコミュニケーションまで支援。品質管理は提携会社と連携して進行します。</p>
+            <ul>
+              <li>中国・インド・アメリカ・オーストラリアの取引先</li>
+              <li>中国語・英語をAIエージェントで補助</li>
+              <li>多種多様な素材に対応</li>
+              <li>提携会社による品質管理体制</li>
+            </ul>
+            <a class="s-link" href="./iaspira-trade.html">宝飾輸出入のホームページ</a>
+          </article>
+          <article class="svc" style="--c: var(--c-web);">
+            <div class="s-glyph"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 9h18M8 21h8"/></svg></div>
+            <p class="s-en">Web &amp; 3D Site</p>
+            <h3>ホームページ制作</h3>
+            <p>訴求整理から見出し設計、CV導線、3Dサイト生成まで。短納期で検証できるホームページを、業種ごとに最適化します。</p>
+            <ul>
+              <li>3Dサイト生成と業種別テンプレート対応</li>
+              <li>CV導線設計・ホームページ改善</li>
+              <li>オンライン決済導入</li>
+              <li>ページ内AI質疑応答機能の構築</li>
+            </ul>
+            <a class="s-link" href="./iaspira-web.html">ホームページ制作のホームページ</a>
+          </article>
+          <article class="svc" style="--c: var(--c-app);">
+            <div class="s-glyph"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M10.5 18.5h3"/></svg></div>
+            <p class="s-en">App Development</p>
+            <h3>アプリ開発</h3>
+            <p>事業効率化や新規サービス検証に向けたアプリを、企画から実装、保守改善まで一貫して構築します。</p>
+            <ul>
+              <li>iOS / Android / Web 対応</li>
+              <li>MVP開発のスピードを重視</li>
+              <li>企画から実装まで一貫対応</li>
+              <li>保守・改善まで伴走</li>
+            </ul>
+            <a class="s-link" href="./iaspira-app.html">アプリ開発のホームページ</a>
+          </article>
+          <article class="svc" style="--c: var(--c-ad);">
+            <div class="s-glyph"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M3 11l14-6v14L3 13v-2z"/><path d="M7 14v4a2 2 0 004 0v-3M17 8a4 4 0 010 8"/></svg></div>
+            <p class="s-en">Ad Strategy</p>
+            <h3>広告代理店</h3>
+            <p>美容、FX、インフルエンサー事務所など、複数領域の広告戦略、クリエイティブ制作、ホームページ改善を支援します。</p>
+            <ul>
+              <li>広告戦略とクリエイティブ制作</li>
+              <li>美容・FX・インフルエンサー事務所の事業展開</li>
+              <li>FX領域：Dooprime公式パートナーズ</li>
+              <li>顧客数1400人 / アセット8000万</li>
+            </ul>
+            <a class="s-link" href="./iaspira-ad.html">広告代理店のホームページ</a>
+          </article>
+          <article class="svc" style="--c: var(--c-ai);">
+            <div class="s-glyph"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="5" y="7" width="14" height="12" rx="3"/><circle cx="9.5" cy="12.5" r="1.2"/><circle cx="14.5" cy="12.5" r="1.2"/><path d="M12 7V4M9 4h6"/></svg></div>
+            <p class="s-en">AI Agent</p>
+            <h3>AIエージェント</h3>
+            <p>問い合わせ対応、情報収集、コンテンツ生成、営業補助など、現場の手間を減らすAIエージェントを設計します。</p>
+            <ul>
+              <li>業務自動化と社内オペレーション改善</li>
+              <li>問い合わせ対応</li>
+              <li>データ収集と整理</li>
+              <li>コンテンツ生成・営業補助</li>
+            </ul>
+            <a class="s-link" href="./iaspira-ai.html">AIエージェントのホームページ</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== WHY ===== -->
+    <section id="why">
+      <div class="wrap">
+        <div class="sec-head rv">
+          <p class="sec-eyebrow"><span class="num">03</span>Why IASPIRA</p>
+          <h2>国際性と実装力で、事業の距離を縮める。</h2>
+          <p class="sec-lead">海外調達、宝飾の美意識、ホームページやアプリの開発、AI活用を別々の話にせず、事業成果につながる順番で編集します。</p>
+        </div>
+        <div class="why-grid rv">
+          <article class="why">
+            <p class="w-num">01</p>
+            <h3>多言語・越境対応</h3>
+            <p>英語・中国語を中心に、AIエージェントも活用しながら海外取引や顧客対応の速度を高めます。</p>
+          </article>
+          <article class="why">
+            <p class="w-num">02</p>
+            <h3>企画から実装まで一気通貫</h3>
+            <p>訴求、デザイン、開発、広告改善までを分断せず、検証に必要な形へすばやく落とし込みます。</p>
+          </article>
+          <article class="why">
+            <p class="w-num">03</p>
+            <h3>後から伸ばせる設計</h3>
+            <p>実績数値、導入事例、商品写真、取引先情報を後から差し込める余白を残し、成長に合わせてホームページを更新できます。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SIGNATURE BAND ===== -->
+    <section class="mx-band">
+      <img src="./assets/img/band-index.jpg" alt="" decoding="async">
+      <div class="mx-band-in wrap">
+        <p class="mx-band-en">Obsidian Atelier</p>
+        <p class="mx-band-jp">美と実装力を、ひとつのチームに。</p>
+      </div>
+    </section>
+
+    <!-- ===== PROCESS ===== -->
+    <section id="process">
+      <div class="wrap">
+        <div class="sec-head rv">
+          <p class="sec-eyebrow"><span class="num">04</span>Process</p>
+          <h2>曖昧な相談を、実行可能な計画へ。</h2>
+          <p class="sec-lead">最初から要件が固まっていなくても構いません。目的、制約、優先順位を整理し、最短で形にできる進め方を提案します。</p>
+        </div>
+        <div class="process-list rv">
+          <div class="step"><span class="s-num">01</span><h3>目的整理</h3><p>売りたい商品、改善したい業務、獲得したい顧客を整理します。</p></div>
+          <div class="step"><span class="s-num">02</span><h3>設計</h3><p>必要な機能、導線、制作範囲、言語対応、運用方法を決めます。</p></div>
+          <div class="step"><span class="s-num">03</span><h3>制作</h3><p>宝飾、ホームページ、アプリ、AI、広告素材を目的に合わせて構築します。</p></div>
+          <div class="step"><span class="s-num">04</span><h3>改善</h3><p>公開後・納品後の反応を見ながら、訴求や導線を磨きます。</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CASE SPACE ===== -->
+    <section id="case">
+      <div class="wrap">
+        <div class="sec-head rv">
+          <p class="sec-eyebrow"><span class="num">05</span>Case Space</p>
+          <h2>実績を追加できる、余白のあるホームページ。</h2>
+          <p class="sec-lead">現時点で未提供の実績・写真・導入社名はプレースホルダーとして設計。公開前に差し替えるだけで信頼情報を強化できます。</p>
+        </div>
+        <div class="case-grid rv">
+          <div class="case has-img"><img class="mx-img" src="./assets/img/case-jewelry.jpg" alt="宝飾事例（イメージ）" decoding="async">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.4"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 15l5-5 4 4 3-3 6 6"/><circle cx="9" cy="9" r="1.5"/></svg>
+            <p class="c-tag">Project Image</p>
+            <p class="c-label">宝飾事例</p>
+          </div>
+          <div class="case has-img"><img class="mx-img" src="./assets/img/case-partner.jpg" alt="取引先・提携先（イメージ）" decoding="async">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.4"><path d="M4 21V8l8-5 8 5v13"/><path d="M9 21v-6h6v6"/></svg>
+            <p class="c-tag">Client / Partner</p>
+            <p class="c-label">取引先・提携先</p>
+          </div>
+          <div class="case has-img"><img class="mx-img" src="./assets/img/case-result.jpg" alt="成果数値（イメージ）" decoding="async">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.4"><path d="M4 19h16M6 16l4-5 3 3 5-7"/></svg>
+            <p class="c-tag">Result</p>
+            <p class="c-label">成果数値</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CONTACT ===== -->
+    <section class="contact" id="contact">
+      <div class="wrap">
+        <div class="contact-in rv">
+          <div>
+            <p class="sec-eyebrow">Contact</p>
+            <h2>まずは、いま動かしたい事業を聞かせてください。</h2>
+            <p>宝飾の相談、海外取引、ホームページ・アプリ制作、AI導入、広告改善まで。目的に合わせて、最初に着手すべき領域を一緒に整理します。</p>
+            <div class="hero-ctas">
+              <a class="btn btn-fill" href="mailto:iaspira@goatmail.uk?subject=【IASPIRA】事業相談">メールで相談する</a>
+              <a class="btn btn-line" href="https://lin.ee/VC0YXHV" target="_blank" rel="noopener">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 5.64 2 10.13c0 4.02 3.57 7.39 8.39 8.03.33.07.77.22.89.5.1.26.07.66.03.92l-.14.87c-.04.26-.2 1.02.89.56 1.1-.46 5.91-3.48 8.07-5.96C21.62 13.4 22 11.83 22 10.13 22 5.64 17.52 2 12 2z"/></svg>
+                LINEで相談する
+              </a>
+              <a class="btn btn-ghost" href="#services">依頼内容を確認する</a>
+            </div>
+          </div>
+          <div class="c-info">
+            <div class="c-row"><p class="k">Company</p><p class="v">IASPIRA</p></div>
+            <div class="c-row"><p class="k">Email</p><p class="v">iaspira@goatmail.uk</p></div>
+            <div class="c-row"><p class="k">Address</p><p class="v">〒150-0012 東京都渋谷区広尾１丁目１１−２</p></div>
+            <div class="c-row"><p class="k">Business Hours</p><p class="v">日本時間 8:00〜20:00</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p class="foot-word" aria-hidden="true">IASPIRA</p>
+      <div class="foot-in">
+        <nav class="foot-links" aria-label="サービスページ">
+          <a href="./iaspira-jewelry.html">宝飾作成</a>
+          <a href="./iaspira-trade.html">宝飾輸出入</a>
+          <a href="./iaspira-web.html">ホームページ制作</a>
+          <a href="./iaspira-app.html">アプリ開発</a>
+          <a href="./iaspira-ad.html">広告代理店</a>
+          <a href="./iaspira-ai.html">AIエージェント</a>
+        </nav>
+        <p class="copy">© IASPIRA — Jewelry / Global Trade / Web / App / Ads / AI Agent</p>
+      </div>
+    </div>
+  </footer>
+
+  <script type="importmap">
+    { "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    } }
+  </script>
+  <!-- ★差し替え可能ブロック★ Hero 3D（マウント: #constellation3d）。ユーザー提供3Dコードに載せ替え可。 -->
+  <script type="module" data-3d="hero-constellation">
+    import * as THREE from 'three';
+    import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+    const mount = document.getElementById('constellation3d');
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    try {
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.1;
+      mount.appendChild(renderer.domElement);
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(40, 1, .1, 60);
+      camera.position.set(0, 0, 8.5);
+
+      const pmrem = new THREE.PMREMGenerator(renderer);
+      scene.environment = pmrem.fromScene(new RoomEnvironment(), .05).texture;
+
+      // 中央：シャンパンゴールドの母体クリスタル
+      const goldMat = new THREE.MeshStandardMaterial({
+        color: 0xd9bd8e, metalness: 1, roughness: .26, envMapIntensity: 1.4, flatShading: true
+      });
+      const core = new THREE.Group();
+      const crown = new THREE.Mesh(new THREE.CylinderGeometry(.5, .95, .42, 9, 1), goldMat);
+      crown.position.y = .21;
+      const pav = new THREE.Mesh(new THREE.ConeGeometry(.95, 1.2, 9, 1), goldMat);
+      pav.rotation.x = Math.PI; pav.rotation.y = Math.PI / 9; pav.position.y = -.6;
+      core.add(crown, pav);
+      core.position.x = 2.6;
+      scene.add(core);
+
+      // 周囲：6事業の宝石（それぞれのアクセント色）
+      const colors = [0xf0a3d4, 0xe3b964, 0x5aa8ff, 0x9d8cff, 0xf0a35c, 0x3ddca8];
+      const sats = [];
+      colors.forEach((c, i) => {
+        const m = new THREE.Mesh(
+          new THREE.OctahedronGeometry(.26, 0),
+          new THREE.MeshPhysicalMaterial({
+            color: c, metalness: .15, roughness: .12,
+            transmission: .75, thickness: .8, ior: 1.6,
+            emissive: c, emissiveIntensity: .14,
+            envMapIntensity: 1.4, flatShading: true
+          })
+        );
+        sats.push({ m, phase: i * Math.PI / 3, r: 2.1 + (i % 2) * .55, speed: .22 + (i % 3) * .05 });
+        scene.add(m);
+      });
+
+      // 結ぶ細い光のライン
+      const lineGeo = new THREE.BufferGeometry();
+      const linePos = new Float32Array(6 * 2 * 3);
+      lineGeo.setAttribute('position', new THREE.BufferAttribute(linePos, 3));
+      const lines = new THREE.LineSegments(lineGeo, new THREE.LineBasicMaterial({
+        color: 0xd9bd8e, transparent: true, opacity: .22
+      }));
+      scene.add(lines);
+
+      const l1 = new THREE.PointLight(0xffe2b0, 40, 40); l1.position.set(5, 4, 5); scene.add(l1);
+      const l2 = new THREE.PointLight(0x9d8cff, 16, 40); l2.position.set(-5, -3, 3); scene.add(l2);
+      scene.add(new THREE.AmbientLight(0x383044, 1.7));
+      const key = new THREE.DirectionalLight(0xffffff, 1.3);
+      key.position.set(3, 5, 2); scene.add(key);
+
+      // 星屑
+      const N = 420, pos = new Float32Array(N * 3);
+      for (let i = 0; i < N; i++) {
+        pos[i*3] = (Math.random() - .5) * 22;
+        pos[i*3+1] = (Math.random() - .5) * 12;
+        pos[i*3+2] = (Math.random() - .5) * 10 - 2;
+      }
+      const pgeo = new THREE.BufferGeometry();
+      pgeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      const dust = new THREE.Points(pgeo, new THREE.PointsMaterial({
+        color: 0xf0e6d2, size: .025, transparent: true, opacity: .65,
+        blending: THREE.AdditiveBlending, depthWrite: false
+      }));
+      scene.add(dust);
+
+      let mx = 0, my = 0;
+      addEventListener('pointermove', e => {
+        mx = (e.clientX / innerWidth - .5) * 2;
+        my = (e.clientY / innerHeight - .5) * 2;
+      }, { passive: true });
+
+      function resize() {
+        const w = mount.clientWidth, h = mount.clientHeight;
+        renderer.setSize(w, h);
+        camera.aspect = w / h; camera.updateProjectionMatrix();
+      }
+      new ResizeObserver(resize).observe(mount);
+      resize();
+
+      function layout(t) {
+        for (let i = 0; i < sats.length; i++) {
+          const s = sats[i];
+          const a = t * s.speed + s.phase;
+          s.m.position.set(
+            core.position.x + Math.cos(a) * s.r,
+            Math.sin(a * 1.2) * 1.1,
+            Math.sin(a) * 1.2
+          );
+          s.m.rotation.y = t * .8 + i;
+          linePos[i*6] = core.position.x; linePos[i*6+1] = core.position.y; linePos[i*6+2] = 0;
+          linePos[i*6+3] = s.m.position.x; linePos[i*6+4] = s.m.position.y; linePos[i*6+5] = s.m.position.z;
+        }
+        lineGeo.attributes.position.needsUpdate = true;
+      }
+      layout(0);
+
+      const clock = new THREE.Clock();
+      renderer.setAnimationLoop(() => {
+        const t = clock.getElapsedTime();
+        if (!reduced) {
+          core.rotation.y = t * .3;
+          core.position.y = Math.sin(t * .7) * .12;
+          layout(t);
+          dust.rotation.y = t * .012;
+        }
+        core.rotation.x = THREE.MathUtils.lerp(core.rotation.x, my * .15, .04);
+        camera.position.x = THREE.MathUtils.lerp(camera.position.x, mx * .3, .03);
+        renderer.render(scene, camera);
+      });
+      if (reduced) { renderer.render(scene, camera); renderer.setAnimationLoop(null); }
+    } catch (e) { /* WebGL不可ならグラデ背景のまま */ }
+  </script>
+
+  <script>
+    const nav = document.getElementById('nav');
+    addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 40), { passive: true });
+    const io = new IntersectionObserver(es => es.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    }), { threshold: .12 });
+    document.querySelectorAll('.rv').forEach(el => io.observe(el));
+  </script>
+  <script type="module" src="./assets/iaspira-motion.js?v=20260707h"></script>
+</body>
+</html>
