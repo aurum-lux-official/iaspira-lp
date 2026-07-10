@@ -33,6 +33,7 @@ if (reduced) {
     if (!matchMedia("(hover: hover) and (pointer: fine)").matches) return;
     const { default: Lenis } = await import("https://cdn.jsdelivr.net/npm/lenis@1.1.18/+esm");
     const lenis = new Lenis({ duration: 1.1, easing: (t) => 1 - Math.pow(1 - t, 3) });
+    window.__mxLenis = lenis;
     html.classList.add("mx-lenis");
     const loop = (t) => { lenis.raf(t); requestAnimationFrame(loop); };
     requestAnimationFrame(loop);
@@ -216,6 +217,84 @@ if (reduced) {
       ring.style.transform = `translate(${rx}px, ${ry}px)`;
       requestAnimationFrame(loop);
     })();
+  });
+
+  /* ---- ナビCTA：✉️独自マーク（ダイヤ封蝋のエンベロープ） ---- */
+  safe(() => {
+    const btn = q(".nav .btn-nav");
+    if (!btn) return;
+    btn.setAttribute("aria-label", btn.textContent.trim());
+    btn.classList.add("mx-mail");
+    btn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true">'
+      + '<rect x="2.6" y="5" width="18.8" height="14" rx="2.6"/>'
+      + '<path d="M3.2 6.6l7.4 5.7a2.3 2.3 0 0 0 2.8 0l7.4-5.7"/>'
+      + '<path d="M12 14.2l-2.1-2.5 2.1-2.5 2.1 2.5z" fill="currentColor" stroke="none"/>'
+      + '</svg>';
+  });
+
+  /* ---- 左上メニュー（全画面オーバーレイ・各セクション＋他ページ） ---- */
+  safe(() => {
+    const navIn = q(".nav .nav-in");
+    if (!navIn) return;
+    const btn = document.createElement("button");
+    btn.className = "mx-menu-btn";
+    btn.setAttribute("aria-label", "メニューを開く");
+    btn.setAttribute("aria-expanded", "false");
+    btn.innerHTML = "<i></i><i></i>";
+    navIn.insertBefore(btn, navIn.firstChild);
+
+    const secs = qa("section[id]").filter((s) => s.querySelector(".sec-eyebrow"));
+    const secLinks = secs.map((s) => {
+      const en = (s.querySelector(".sec-eyebrow").textContent || s.id).replace(/^\s*\d+\s*/, "").trim();
+      const h2 = s.querySelector("h2");
+      const jp = h2 ? h2.textContent.trim() : "";
+      return '<a class="mx-menu-link" href="#' + s.id + '"><span class="en">' + en + '</span><span class="jp">' + jp + "</span></a>";
+    }).join("");
+    const cross = qa(".foot-links a").map((a) =>
+      '<a href="' + a.getAttribute("href") + '">' + a.textContent.trim() + "</a>").join("");
+    const overlay = document.createElement("div");
+    overlay.className = "mx-menu";
+    overlay.innerHTML = '<div class="mx-menu-in wrap">'
+      + '<p class="mx-menu-eyebrow">Menu</p>'
+      + '<nav class="mx-menu-secs" aria-label="ページ内セクション">' + secLinks + "</nav>"
+      + '<div class="mx-menu-cross"><p class="mx-menu-eyebrow">Other Pages</p>'
+      + '<nav aria-label="他のページ">' + cross + "</nav></div></div>";
+    document.body.appendChild(overlay);
+
+    const setOpen = (open) => {
+      html.classList.toggle("mx-menu-open", open);
+      btn.setAttribute("aria-expanded", String(open));
+      btn.setAttribute("aria-label", open ? "メニューを閉じる" : "メニューを開く");
+      if (window.__mxLenis) { open ? window.__mxLenis.stop() : window.__mxLenis.start(); }
+    };
+    btn.addEventListener("click", () => setOpen(!html.classList.contains("mx-menu-open")));
+    addEventListener("keydown", (e) => { if (e.key === "Escape") setOpen(false); });
+    overlay.addEventListener("click", (e) => {
+      const a = e.target.closest("a");
+      if (!a) return;
+      const href = a.getAttribute("href");
+      if (href && href.startsWith("#")) {
+        e.preventDefault();
+        setOpen(false);
+        const t = document.querySelector(href);
+        if (t) {
+          if (window.__mxLenis) window.__mxLenis.scrollTo(t, { offset: -70 });
+          else t.scrollIntoView({ behavior: "smooth" });
+        }
+      } else setOpen(false);
+    });
+  });
+
+  /* ---- 事例動画（.mx-vid）：視界内のみ再生・失敗時は画像へ ---- */
+  safe(() => {
+    qa("video.mx-vid").forEach((v) => {
+      v.addEventListener("error", () => v.remove());
+      const wrap = v.closest(".w-visual, .case, .mx-band") || v;
+      inView(wrap, () => {
+        v.play().catch(() => v.remove());
+        return () => v.pause();
+      }, { amount: 0.25 });
+    });
   });
 
   /* ---- ナビ：スクロール方向で格納/復帰 ---- */

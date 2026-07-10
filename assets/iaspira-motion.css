@@ -67,7 +67,9 @@ html.mx .btn { transition: border-color .35s ease, background-color .35s ease, b
    `.nav { position: fixed }`(0010) に勝って追従ナビが無効化されていた。
    ここで同詳細度・後勝ちで fixed を復元する（.scrolled のガラス背景や
    格納演出は fixed 前提で書かれている）。 */
-header.nav { position: fixed; }
+/* さらに `main, header.nav, footer { z-index:1 }`(0011) が .nav{z-index:50} を
+   上書きし、後続DOMのヒーローがナビのクリックを奪っていたため z-index も復元 */
+header.nav { position: fixed; z-index: 50; }
 html.mx .nav { transition: transform .55s cubic-bezier(.2,.7,.2,1), background .4s ease, border-color .4s ease; }
 html.mx .nav.mx-hide { transform: translateY(-100%); }
 
@@ -231,6 +233,78 @@ html { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--acc) 35%
   /* バーがフッター下部に被らないよう余白を確保 */
   html.mx footer { padding-bottom: 110px; }
 }
+
+/* ---- 横ズレ固定（3D意匠のはみ出しによる水平パン防止） ---- */
+html, body { overflow-x: clip; }
+html { overscroll-behavior-x: none; }
+
+/* ---- ナビCTA：メールマーク（円形アイコンボタン） ---- */
+.btn-nav.mx-mail { width: 46px; height: 46px; padding: 0; border-radius: 50%; }
+.btn-nav.mx-mail svg { display: block; }
+
+/* ---- 左上メニュー ---- */
+.mx-menu-btn {
+  width: 44px; height: 44px; flex: none;
+  display: flex; flex-direction: column; gap: 7px;
+  align-items: center; justify-content: center;
+  background: rgb(255 255 255 / 4%); border: 1px solid var(--line-strong);
+  border-radius: 50%; cursor: pointer; padding: 0;
+  transition: border-color .3s ease, background .3s ease;
+}
+.mx-menu-btn:hover { border-color: var(--acc-dim); }
+.mx-menu-btn i {
+  display: block; width: 18px; height: 1px; background: var(--ink);
+  transition: transform .45s cubic-bezier(.2, .7, .2, 1);
+}
+html.mx-menu-open .mx-menu-btn i:first-child { transform: translateY(4px) rotate(45deg); }
+html.mx-menu-open .mx-menu-btn i:last-child { transform: translateY(-4px) rotate(-45deg); }
+.mx-menu {
+  position: fixed; inset: 0; z-index: 49;
+  background: rgb(7 7 12 / 92%); backdrop-filter: blur(22px) saturate(1.1);
+  opacity: 0; visibility: hidden; overflow-y: auto;
+  transition: opacity .5s ease, visibility 0s linear .5s;
+}
+html.mx-menu-open .mx-menu { opacity: 1; visibility: visible; transition: opacity .5s ease; }
+html.mx-menu-open { overflow: hidden; }
+html.mx-menu-open .mx-progress, html.mx-menu-open .mx-rail, html.mx-menu-open .mx-cta-bar { opacity: 0; pointer-events: none; }
+.mx-menu-in { padding: 150px 0 90px; display: grid; gap: 60px; }
+.mx-menu-eyebrow {
+  font-family: var(--display); font-style: italic; font-size: 12px;
+  letter-spacing: .42em; color: var(--acc); text-transform: uppercase; margin: 0 0 16px;
+}
+.mx-menu-secs { display: grid; }
+.mx-menu-link {
+  display: flex; align-items: baseline; gap: 22px; flex-wrap: wrap;
+  padding: 14px 0; border-bottom: 1px solid var(--line);
+  transform: translateY(16px); opacity: 0;
+  transition: transform .6s cubic-bezier(.2, .7, .2, 1), opacity .6s ease, background .3s ease;
+}
+html.mx-menu-open .mx-menu-link { transform: none; opacity: 1; }
+.mx-menu-link:nth-child(1) { transition-delay: .06s; }
+.mx-menu-link:nth-child(2) { transition-delay: .11s; }
+.mx-menu-link:nth-child(3) { transition-delay: .16s; }
+.mx-menu-link:nth-child(4) { transition-delay: .21s; }
+.mx-menu-link:nth-child(5) { transition-delay: .26s; }
+.mx-menu-link:nth-child(6) { transition-delay: .31s; }
+.mx-menu-link:nth-child(7) { transition-delay: .36s; }
+.mx-menu-link:nth-child(8) { transition-delay: .41s; }
+.mx-menu-link .en {
+  font-family: var(--display); font-style: italic; text-transform: uppercase;
+  font-size: clamp(22px, 3vw, 34px); letter-spacing: .14em; color: var(--ink);
+  transition: color .3s ease;
+}
+.mx-menu-link .jp { font-size: 12.5px; letter-spacing: .06em; color: var(--faint); }
+.mx-menu-link:hover .en { color: var(--acc); }
+.mx-menu-cross nav { display: flex; flex-wrap: wrap; gap: 10px 28px; font-size: 13px; color: var(--sub); }
+.mx-menu-cross a { transition: color .3s ease; }
+.mx-menu-cross a:hover { color: var(--acc); }
+
+/* ---- 事例動画（works/caseカード内） ---- */
+.w-visual.has-img video, .case.has-img video {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; filter: brightness(.88) saturate(1.04);
+}
+html.mx-r .mx-vid { display: none; }
 
 /* Lenis有効時はネイティブsmoothを無効化（二重スムージング防止） */
 html.mx-lenis { scroll-behavior: auto; }
