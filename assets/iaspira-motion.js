@@ -120,15 +120,27 @@ if (reduced) {
     }
   });
 
-  /* ---- セクション見出し：eyebrow線ドロー＋段差リビール ---- */
+  /* ---- セクション見出し：eyebrow線ドロー＋行マスク展開＋段差リビール ---- */
   safe(() => {
     qa(".sec-head").forEach((head) => {
       const parts = [...head.children];
       parts.forEach((p) => (p.style.opacity = "0"));
+      /* h2は行マスクからせり上がる（セクション展開の署名） */
+      const h2 = head.querySelector("h2");
+      let inner = null;
+      if (h2) {
+        const w = document.createElement("span"); w.className = "mx-h2w";
+        inner = document.createElement("span"); inner.className = "mx-h2i";
+        while (h2.firstChild) inner.appendChild(h2.firstChild);
+        w.appendChild(inner); h2.appendChild(w);
+        inner.style.transform = "translateY(108%)";
+      }
       inView(head, () => {
         head.classList.add("mx-in");
         animate(parts, { opacity: [0, 1], y: [26, 0] },
           { duration: 0.8, delay: stagger(0.14), easing: EASE });
+        if (inner) animate(inner, { y: ["108%", "0%"] },
+          { duration: 0.95, delay: 0.12, easing: EASE });
       }, { amount: 0.4 });
     });
   });
@@ -143,7 +155,7 @@ if (reduced) {
       kids.forEach((k) => (k.style.opacity = "0"));
       inView(grid, () => {
         grid.classList.add("mx-in");
-        animate(kids, { opacity: [0, 1], y: [30, 0] },
+        animate(kids, { opacity: [0, 1], y: [30, 0], scale: [0.98, 1] },
           { duration: 0.75, delay: stagger(0.09), easing: EASE });
       }, { amount: 0.15 });
     });
@@ -299,6 +311,12 @@ if (reduced) {
   /* ---- シグネチャーバンド：パララックス＋コピー登場 ---- */
   safe(() => {
     qa(".mx-band").forEach((band) => {
+      /* 帯全体が左右から開く（展開演出） */
+      band.style.clipPath = "inset(0 7% 0 7%)";
+      inView(band, () => {
+        animate(band, { clipPath: ["inset(0 7% 0 7%)", "inset(0 0% 0 0%)"] },
+          { duration: 1.15, easing: EASE });
+      }, { amount: 0.25 });
       const img = band.querySelector("img");
       if (img) {
         img.addEventListener("error", () => band.remove());

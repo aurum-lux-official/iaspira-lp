@@ -273,7 +273,7 @@
     .copy { font-size: 11px; letter-spacing: .2em; color: var(--faint); }
   </style>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 3h12l4 6-10 12L2 9l4-6z' fill='%23d9bd8e'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="./assets/iaspira-motion.css?v=20260708c">
+  <link rel="stylesheet" href="./assets/iaspira-motion.css?v=20260709b">
   <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "name": "IASPIRA", "url": "https://aurum-lux-official.github.io/iaspira-lp/", "email": "iaspira@goatmail.uk", "description": "IASPIRAは、宝飾作成・輸出入、ホームページ制作、アプリ開発、FX領域の広告支援、AIエージェント構築を横断して支援します。", "address": {"@type": "PostalAddress", "postalCode": "150-0012", "addressRegion": "東京都", "addressLocality": "渋谷区", "streetAddress": "広尾１丁目１１−２", "addressCountry": "JP"}}</script>
 </head>
 <body>
@@ -579,7 +579,7 @@
 
       // 中央：シャンパンゴールドの母体クリスタル
       const goldMat = new THREE.MeshStandardMaterial({
-        color: 0xd9bd8e, metalness: 1, roughness: .26, envMapIntensity: 1.4, flatShading: true
+        color: 0xd9bd8e, metalness: 1, roughness: .18, envMapIntensity: 2.0, flatShading: true
       });
       const core = new THREE.Group();
       const crown = new THREE.Mesh(new THREE.CylinderGeometry(.5, .95, .42, 9, 1), goldMat);
@@ -597,10 +597,12 @@
         const m = new THREE.Mesh(
           new THREE.OctahedronGeometry(.26, 0),
           new THREE.MeshPhysicalMaterial({
-            color: c, metalness: .15, roughness: .12,
-            transmission: .75, thickness: .8, ior: 1.6,
-            emissive: c, emissiveIntensity: .14,
-            envMapIntensity: 1.4, flatShading: true
+            color: c, metalness: 0, roughness: .06,
+            transmission: .92, thickness: 1.1, ior: 1.85,
+            iridescence: .5, iridescenceIOR: 1.8,
+            clearcoat: 1, clearcoatRoughness: .05,
+            emissive: c, emissiveIntensity: .1,
+            envMapIntensity: 2.1, flatShading: true
           })
         );
         sats.push({ m, phase: i * Math.PI / 3, r: 2.1 + (i % 2) * .55, speed: .22 + (i % 3) * .05 });
@@ -693,6 +695,6 @@
     }), { threshold: .12 });
     document.querySelectorAll('.rv').forEach(el => io.observe(el));
   </script>
-  <script type="module" src="./assets/iaspira-motion.js?v=20260708c"></script>
+  <script type="module" src="./assets/iaspira-motion.js?v=20260709b"></script>
 </body>
 </html>

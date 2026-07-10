@@ -338,7 +338,7 @@
     .copy { font-size: 11px; letter-spacing: .2em; color: var(--faint); }
   </style>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 3h12l4 6-10 12L2 9l4-6z' fill='%23d9bd8e'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="./assets/iaspira-motion.css?v=20260708c">
+  <link rel="stylesheet" href="./assets/iaspira-motion.css?v=20260709b">
   <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Service", "name": "宝飾輸出入・越境調達", "description": "世界の産地・サプライヤーと接続し、通関・物流・契約・品質鑑定までワンストップ。宝飾の輸出入と越境調達を、安心してお任せいただけます。", "url": "https://aurum-lux-official.github.io/iaspira-lp/iaspira-trade.html", "areaServed": "JP", "provider": {"@type": "Organization", "name": "IASPIRA", "url": "https://aurum-lux-official.github.io/iaspira-lp/", "email": "iaspira@goatmail.uk"}}</script>
 </head>
 <body>
@@ -738,9 +738,10 @@
       scene.environment = pmrem.fromScene(new RoomEnvironment(), .05).texture;
 
       // 黄金のジェム（交易の象徴として2本のオービットリングを纏う）
-      const goldMat = new THREE.MeshStandardMaterial({
-        color: 0xd9a84e, metalness: 1, roughness: .24,
-        envMapIntensity: 1.5, flatShading: true
+      const goldMat = new THREE.MeshPhysicalMaterial({
+        color: 0xd9a84e, metalness: 1, roughness: .16,
+        clearcoat: 1, clearcoatRoughness: .12,
+        envMapIntensity: 2.2, flatShading: true
       });
       const gem = new THREE.Group();
       const crown = new THREE.Mesh(new THREE.CylinderGeometry(.6, 1.12, .5, 9, 1), goldMat);
@@ -753,7 +754,7 @@
       scene.add(gem);
 
       const ringMat = new THREE.MeshStandardMaterial({
-        color: 0xefd292, metalness: 1, roughness: .3, envMapIntensity: 1.2
+        color: 0xefd292, metalness: 1, roughness: .2, envMapIntensity: 1.9
       });
       const ring1 = new THREE.Mesh(new THREE.TorusGeometry(2.05, .015, 12, 140), ringMat);
       ring1.rotation.x = Math.PI / 2.4;
@@ -832,6 +833,6 @@
     }), { threshold: .12 });
     document.querySelectorAll('.rv').forEach(el => io.observe(el));
   </script>
-  <script type="module" src="./assets/iaspira-motion.js?v=20260708c"></script>
+  <script type="module" src="./assets/iaspira-motion.js?v=20260709b"></script>
 </body>
 </html>

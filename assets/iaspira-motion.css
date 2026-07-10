@@ -37,6 +37,14 @@ html.mx-r .mx-dot, html.mx-r .mx-ring { display: none; }
 .mx-wi { display: inline-block; transform: translateY(112%); will-change: transform; }
 html.mx-r .mx-wi { transform: none; }
 
+/* ---- セクション見出しの行マスク（展開演出） ---- */
+.mx-h2w { display: block; overflow: hidden; }
+.mx-h2i { display: block; will-change: transform; }
+
+/* ---- セクション見出しの行マスク（JSが生成。展開演出用） ---- */
+.mx-h2w { display: block; overflow: hidden; }
+.mx-h2i { display: block; will-change: transform; }
+
 /* ---- eyebrow 罫線ドロー ---- */
 html.mx .sec-eyebrow::after { transform: scaleX(0); transform-origin: left center; transition: transform 1.1s cubic-bezier(.2,.7,.2,1) .15s; }
 html.mx .mx-in .sec-eyebrow::after { transform: scaleX(1); }
