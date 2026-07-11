@@ -18,7 +18,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Shippori+Mincho:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Shippori+Mincho:wght@400;500;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #0a0a12;
@@ -299,7 +299,7 @@
     .copy { font-size: 11px; letter-spacing: .2em; color: var(--faint); }
   </style>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 3h12l4 6-10 12L2 9l4-6z' fill='%23d9bd8e'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="./assets/iaspira-motion.css?v=20260711a">
+  <link rel="stylesheet" href="./assets/iaspira-motion.css?v=20260711b">
   <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Service", "name": "アプリ開発", "description": "企画・要件定義からUI/UXデザイン、開発、リリース後の運用・改善まで。AIも活用し、成果につながるアプリを一気通貫で開発します。", "url": "https://aurum-lux-official.github.io/iaspira-lp/iaspira-app.html", "areaServed": "JP", "provider": {"@type": "Organization", "name": "IASPIRA", "url": "https://aurum-lux-official.github.io/iaspira-lp/", "email": "iaspira@goatmail.uk"}}</script>
 </head>
 <body>
@@ -641,6 +641,33 @@
       </div>
     </section>
 
+    <!-- ===== CONTACT FORM ===== -->
+    <section id="soudan-form">
+      <div class="wrap">
+        <div class="sec-head rv">
+          <p class="sec-eyebrow">Contact Form</p>
+          <h2>フォームで相談する</h2>
+          <p class="sec-lead">24時間受付。1営業日以内にメールでご返信します。メール・LINEでのご相談も引き続き承ります。</p>
+        </div>
+        <form class="mx-form" action="https://formsubmit.co/iaspira@goatmail.uk" method="POST">
+          <input type="hidden" name="_subject" value="【IASPIRA】LPフォーム（アプリ開発）">
+          <input type="hidden" name="_template" value="table">
+          <input type="hidden" name="_captcha" value="false">
+          <input type="hidden" name="_next" value="https://aurum-lux-official.github.io/iaspira-lp/iaspira-app.html?sent=1#soudan-form">
+          <div class="f-row">
+            <label>お名前
+              <input name="お名前" type="text" required autocomplete="name" placeholder="山田 花子"></label>
+            <label>メールアドレス
+              <input name="メールアドレス" type="email" required autocomplete="email" placeholder="you@example.com"></label>
+          </div>
+          <label>ご相談内容
+            <textarea name="ご相談内容" rows="5" required placeholder="ご相談の概要をご記入ください（例：オーダーメイドの指輪を検討しています）"></textarea></label>
+          <button class="btn btn-fill" type="submit">送信する</button>
+          <p class="mx-form-status" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+
     <!-- ===== FAQ ===== -->
     <section id="faq" style="padding-top:0;">
       <div class="wrap">
@@ -834,6 +861,6 @@
     }), { threshold: .12 });
     document.querySelectorAll('.rv').forEach(el => io.observe(el));
   </script>
-  <script type="module" src="./assets/iaspira-motion.js?v=20260711a"></script>
+  <script type="module" src="./assets/iaspira-motion.js?v=20260711b"></script>
 </body>
 </html>

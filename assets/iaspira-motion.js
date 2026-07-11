@@ -261,12 +261,28 @@ if (reduced) {
       + '<nav aria-label="他のページ">' + cross + "</nav></div></div>";
     document.body.appendChild(overlay);
 
+    let lastFocus = null;
     const setOpen = (open) => {
       html.classList.toggle("mx-menu-open", open);
       btn.setAttribute("aria-expanded", String(open));
       btn.setAttribute("aria-label", open ? "メニューを閉じる" : "メニューを開く");
       if (window.__mxLenis) { open ? window.__mxLenis.stop() : window.__mxLenis.start(); }
+      /* フォーカス管理：開いたら先頭リンクへ、閉じたら呼び出し元へ */
+      if (open) {
+        lastFocus = document.activeElement;
+        const first = overlay.querySelector("a");
+        if (first) setTimeout(() => first.focus(), 80);
+      } else if (lastFocus && lastFocus.focus) { lastFocus.focus(); lastFocus = null; }
     };
+    /* フォーカストラップ：Tabをメニュー内で循環させる */
+    overlay.addEventListener("keydown", (e) => {
+      if (e.key !== "Tab") return;
+      const items = [...overlay.querySelectorAll("a")];
+      if (!items.length) return;
+      const first = items[0], last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
     btn.addEventListener("click", () => setOpen(!html.classList.contains("mx-menu-open")));
     addEventListener("keydown", (e) => { if (e.key === "Escape") setOpen(false); });
     overlay.addEventListener("click", (e) => {
@@ -481,3 +497,38 @@ if (reduced) {
     });
   });
 }
+
+/* ---- お問い合わせフォーム（reduced-motion環境でも動作する独立ブロック） ----
+   FormSubmit(AJAX)へ送信し、失敗時はmailtoへフォールバック。
+   JS無効時はformのaction属性による通常POSTで送信される。 */
+try {
+  document.querySelectorAll("form.mx-form").forEach((form) => {
+    const st = form.querySelector(".mx-form-status");
+    if (new URLSearchParams(location.search).get("sent") === "1" && st) {
+      st.textContent = "送信しました。1営業日以内にご返信します。";
+    }
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = form.querySelector('button[type="submit"]');
+      const data = Object.fromEntries(new FormData(form).entries());
+      btn.disabled = true;
+      if (st) st.textContent = "送信しています…";
+      try {
+        const r = await fetch("https://formsubmit.co/ajax/iaspira@goatmail.uk", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify(data),
+        });
+        if (!r.ok) throw new Error(String(r.status));
+        form.reset();
+        if (st) st.textContent = "送信しました。1営業日以内にご返信します。";
+      } catch (err) {
+        if (st) st.textContent = "通信に失敗したため、メールアプリを開きます…";
+        const body = "お名前: " + (data["お名前"] || "") + "\nメール: " + (data["メールアドレス"] || "") + "\n\n" + (data["ご相談内容"] || "");
+        location.href = "mailto:iaspira@goatmail.uk?subject="
+          + encodeURIComponent(data._subject || "【IASPIRA】相談")
+          + "&body=" + encodeURIComponent(body);
+      } finally { btn.disabled = false; }
+    });
+  });
+} catch (e) { /* フォームが無いページでは何もしない */ }

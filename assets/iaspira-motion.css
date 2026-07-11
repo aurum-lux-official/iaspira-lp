@@ -316,6 +316,40 @@ html.mx-r .mx-vid { display: none; }
   mask-image: linear-gradient(180deg, #000 70%, transparent 99%);
 }
 
+/* ---- タイポグラフィ仕上げ ---- */
+h1, h2, h3, .mx-band-jp { font-feature-settings: "palt"; } /* 和文プロポーショナル詰め */
+h2 { text-wrap: balance; }
+.stat .num, .price, .w-kpi { font-variant-numeric: tabular-nums; }
+
+/* ---- お問い合わせフォーム（全ページ共通・OBSIDIAN様式） ---- */
+.mx-form-wrap { margin-top: 72px; }
+.mx-form-head h3 {
+  font-family: var(--mincho); font-weight: 600; font-size: clamp(20px, 2.4vw, 26px);
+  letter-spacing: .06em; margin: 0 0 10px;
+}
+.mx-form-lead { color: var(--faint); font-size: 13px; margin: 0 0 30px; }
+.mx-form { display: grid; gap: 22px; max-width: 720px; }
+.mx-form .f-row { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+@media (max-width: 640px) { .mx-form .f-row { grid-template-columns: 1fr; } }
+.mx-form label {
+  display: grid; gap: 8px; font-size: 12px; letter-spacing: .14em;
+  color: var(--sub); text-transform: none;
+}
+.mx-form input, .mx-form textarea {
+  width: 100%; padding: 14px 16px; font-size: 15px; font-family: var(--gothic);
+  color: var(--ink); background: rgb(255 255 255 / 3.5%);
+  border: 1px solid var(--line-strong); border-radius: 4px;
+  transition: border-color .3s ease, background .3s ease;
+}
+.mx-form input:focus, .mx-form textarea:focus {
+  outline: none; border-color: var(--acc); background: rgb(255 255 255 / 5.5%);
+}
+.mx-form input::placeholder, .mx-form textarea::placeholder { color: var(--faint); }
+.mx-form textarea { resize: vertical; min-height: 120px; }
+.mx-form button[type="submit"] { justify-self: start; min-width: 220px; }
+.mx-form button[disabled] { opacity: .55; pointer-events: none; }
+.mx-form-status { min-height: 1.5em; font-size: 13px; color: var(--acc); margin: 0; letter-spacing: .04em; }
+
 /* Lenis有効時はネイティブsmoothを無効化（二重スムージング防止） */
 html.mx-lenis { scroll-behavior: auto; }
 
