@@ -755,14 +755,35 @@
         clearcoat: 1, clearcoatRoughness: .12,
         envMapIntensity: 2.2, flatShading: true
       });
+      // ラウンドブリリアントカット生成（旧144面クリスタルの設計を移植）
+      // M=主面数: 総面数は約12M三角形（M=12で144面）
+      function brilliantGeometry(M, R, tableR, crownH, pavD, gTh) {
+        const D = Math.PI * 2 / M, gH = gTh / 2;
+        const yT = crownH + gH, yC = -gH - pavD;
+        const L = (a, b, t) => a + (b - a) * t;
+        const ring = (r, y, off) => Array.from({ length: M }, (_, i) => {
+          const t = i * D + off; return [r * Math.cos(t), y, r * Math.sin(t)];
+        });
+        const A = ring(tableR, yT, 0), B = ring(L(tableR, R, .6), L(yT, gH, .55), D / 2);
+        const G = ring(R, gH, 0), Gb = ring(R, -gH, 0);
+        const Pu = ring(R * .62, L(-gH, yC, .5), D / 2), Pl = ring(R * .26, L(-gH, yC, .84), 0);
+        const pos = [];
+        const tri = (p, q, r) => pos.push(...p, ...q, ...r);
+        const zig = (lo, hi) => { for (let i = 0; i < M; i++) { const j = (i + 1) % M; tri(lo[i], lo[j], hi[i]); tri(lo[j], hi[j], hi[i]); } };
+        const band = (t2, b2) => { for (let i = 0; i < M; i++) { const j = (i + 1) % M; tri(t2[i], t2[j], b2[j]); tri(t2[i], b2[j], b2[i]); } };
+        const tc = [0, yT, 0], cu = [0, yC, 0];
+        for (let i = 0; i < M; i++) tri(tc, A[(i + 1) % M], A[i]);
+        zig(A, B); zig(G, B); band(G, Gb); zig(Gb, Pu); zig(Pl, Pu);
+        for (let i = 0; i < M; i++) tri(Pl[i], cu, Pl[(i + 1) % M]);
+        const g = new THREE.BufferGeometry();
+        g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+        g.computeVertexNormals(); g.center();
+        return g;
+      }
+
       const gem = new THREE.Group();
-      const crown = new THREE.Mesh(new THREE.CylinderGeometry(.6, 1.12, .5, 9, 1), goldMat);
-      crown.position.y = .25;
-      const pavilion = new THREE.Mesh(new THREE.ConeGeometry(1.12, 1.4, 9, 1), goldMat);
-      pavilion.rotation.x = Math.PI; pavilion.rotation.y = Math.PI / 9;
-      pavilion.position.y = -.7;
-      gem.add(crown, pavilion);
-      gem.scale.setScalar(.82);
+      gem.add(new THREE.Mesh(brilliantGeometry(12, 1.12, .63, .34, .96, .05), goldMat));
+      gem.scale.setScalar(.94);
       scene.add(gem);
 
       const ringMat = new THREE.MeshStandardMaterial({
