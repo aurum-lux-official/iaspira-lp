@@ -273,7 +273,7 @@
     .copy { font-size: 11px; letter-spacing: .2em; color: var(--faint); }
   </style>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 3h12l4 6-10 12L2 9l4-6z' fill='%23d9bd8e'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="./assets/iaspira-motion.css?v=20260710b">
+  <link rel="stylesheet" href="./assets/iaspira-motion.css?v=20260711a">
   <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "name": "IASPIRA", "url": "https://aurum-lux-official.github.io/iaspira-lp/", "email": "iaspira@goatmail.uk", "description": "IASPIRAは、宝飾作成・輸出入、ホームページ制作、アプリ開発、FX領域の広告支援、AIエージェント構築を横断して支援します。", "address": {"@type": "PostalAddress", "postalCode": "150-0012", "addressRegion": "東京都", "addressLocality": "渋谷区", "streetAddress": "広尾１丁目１１−２", "addressCountry": "JP"}}</script>
 </head>
 <body>
@@ -560,7 +560,10 @@
   <!-- ★差し替え可能ブロック★ Hero 3D（マウント: #constellation3d）。ユーザー提供3Dコードに載せ替え可。 -->
   <script type="module" data-3d="hero-constellation">
     import * as THREE from 'three';
-    import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+    import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+    import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+    import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+    import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
     const mount = document.getElementById('constellation3d');
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -576,7 +579,20 @@
       camera.position.set(0, 0, 8.5);
 
       const pmrem = new THREE.PMREMGenerator(renderer);
-      scene.environment = pmrem.fromScene(new RoomEnvironment(), .05).texture;
+      // OBSIDIAN STUDIO 環境：漆黒＋ライトストリップ（宝飾撮影セットの反射）
+      const envScene = new THREE.Scene();
+      envScene.background = new THREE.Color(0x050508);
+      const strip = (w, h, hex, lum, x, y, z, ry, rx) => {
+        const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h),
+          new THREE.MeshBasicMaterial({ color: new THREE.Color(hex).multiplyScalar(lum) }));
+        m.position.set(x, y, z); m.rotation.set(rx || 0, ry || 0, 0);
+        envScene.add(m);
+      };
+      strip(7, 1.6, 0xfff1dd, 5.5, 0, 5, 0, 0, Math.PI / 2);
+      strip(1.4, 8, 0xeef2ff, 3.2, -6, 1, 0, Math.PI / 2, 0);
+      strip(1.6, 6, 0xd9bd8e, 2.6, 6, 0, -1, -Math.PI / 2, 0);
+      strip(10, 10, 0x1a1a22, 1, 0, -4.2, 0, 0, -Math.PI / 2);
+      scene.environment = pmrem.fromScene(envScene, .06).texture;
 
       // 中央：シャンパンゴールドの母体クリスタル
       const goldMat = new THREE.MeshStandardMaterial({
@@ -625,6 +641,31 @@
       const key = new THREE.DirectionalLight(0xffffff, 1.3);
       key.position.set(3, 5, 2); scene.add(key);
 
+      // 接地グロー（床の照り返し）
+      const fgTex = (() => {
+        const c = document.createElement('canvas'); c.width = c.height = 128;
+        const g = c.getContext('2d');
+        const gr = g.createRadialGradient(64, 64, 4, 64, 64, 62);
+        gr.addColorStop(0, 'rgba(255,255,255,.9)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+        g.fillStyle = gr; g.fillRect(0, 0, 128, 128);
+        return new THREE.CanvasTexture(c);
+      })();
+      const floorGlow = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: fgTex, color: 0xd9bd8e, transparent: true, opacity: .16,
+        blending: THREE.AdditiveBlending, depthWrite: false
+      }));
+      floorGlow.scale.set(4.6, 1.5, 1); floorGlow.position.set(2.6, -1.6, 0);
+      scene.add(floorGlow);
+      // ブルーム（デスクトップのみ・繊細に）
+      let composer = null;
+      if (innerWidth > 900) {
+        composer = new EffectComposer(renderer);
+        composer.addPass(new RenderPass(scene, camera));
+        composer.addPass(new UnrealBloomPass(new THREE.Vector2(1, 1), .22, .55, .85));
+        composer.addPass(new OutputPass());
+      }
+      const draw = () => { composer ? composer.render() : renderer.render(scene, camera); };
+
       // 星屑
       const N = 420, pos = new Float32Array(N * 3);
       for (let i = 0; i < N; i++) {
@@ -649,6 +690,7 @@
       function resize() {
         const w = mount.clientWidth, h = mount.clientHeight;
         renderer.setSize(w, h);
+        if (composer) composer.setSize(w, h);
         camera.aspect = w / h; camera.updateProjectionMatrix();
       }
       new ResizeObserver(resize).observe(mount);
@@ -675,6 +717,7 @@
       renderer.setAnimationLoop(() => {
         const t = clock.getElapsedTime();
         if (!reduced) {
+          camera.position.y = Math.sin(t * .2) * .1;
           core.rotation.y = t * .3;
           core.position.y = Math.sin(t * .7) * .12;
           layout(t);
@@ -682,9 +725,9 @@
         }
         core.rotation.x = THREE.MathUtils.lerp(core.rotation.x, my * .15, .04);
         camera.position.x = THREE.MathUtils.lerp(camera.position.x, mx * .3, .03);
-        renderer.render(scene, camera);
+        draw();
       });
-      if (reduced) { renderer.render(scene, camera); renderer.setAnimationLoop(null); }
+      if (reduced) { draw(); renderer.setAnimationLoop(null); }
     } catch (e) { /* WebGL不可ならグラデ背景のまま */ }
   </script>
 
@@ -696,6 +739,6 @@
     }), { threshold: .12 });
     document.querySelectorAll('.rv').forEach(el => io.observe(el));
   </script>
-  <script type="module" src="./assets/iaspira-motion.js?v=20260710b"></script>
+  <script type="module" src="./assets/iaspira-motion.js?v=20260711a"></script>
 </body>
 </html>

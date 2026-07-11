@@ -306,6 +306,16 @@ html.mx-menu-open .mx-menu-link { transform: none; opacity: 1; }
 }
 html.mx-r .mx-vid { display: none; }
 
+/* ---- 3Dキャンバスの縁を溶かす（ブルーム合成で不透明になるため） ---- */
+#gem3d canvas {
+  -webkit-mask-image: radial-gradient(ellipse 78% 78% at 52% 46%, #000 50%, transparent 82%);
+  mask-image: radial-gradient(ellipse 78% 78% at 52% 46%, #000 50%, transparent 82%);
+}
+#constellation3d canvas {
+  -webkit-mask-image: linear-gradient(180deg, #000 70%, transparent 99%);
+  mask-image: linear-gradient(180deg, #000 70%, transparent 99%);
+}
+
 /* Lenis有効時はネイティブsmoothを無効化（二重スムージング防止） */
 html.mx-lenis { scroll-behavior: auto; }
 

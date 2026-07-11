@@ -299,7 +299,7 @@
     .copy { font-size: 11px; letter-spacing: .2em; color: var(--faint); }
   </style>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 3h12l4 6-10 12L2 9l4-6z' fill='%23d9bd8e'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="./assets/iaspira-motion.css?v=20260710b">
+  <link rel="stylesheet" href="./assets/iaspira-motion.css?v=20260711a">
   <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Service", "name": "アプリ開発", "description": "企画・要件定義からUI/UXデザイン、開発、リリース後の運用・改善まで。AIも活用し、成果につながるアプリを一気通貫で開発します。", "url": "https://aurum-lux-official.github.io/iaspira-lp/iaspira-app.html", "areaServed": "JP", "provider": {"@type": "Organization", "name": "IASPIRA", "url": "https://aurum-lux-official.github.io/iaspira-lp/", "email": "iaspira@goatmail.uk"}}</script>
 </head>
 <body>
@@ -690,7 +690,6 @@
   <!-- ★差し替え可能ブロック★ Hero 3D（マウント: #device3d）。ユーザー提供3Dコードに載せ替え可。 -->
   <script type="module" data-3d="hero-glass-device">
     import * as THREE from 'three';
-    import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
     const mount = document.getElementById('device3d');
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -706,7 +705,20 @@
       camera.position.set(0, .2, 7.4);
 
       const pmrem = new THREE.PMREMGenerator(renderer);
-      scene.environment = pmrem.fromScene(new RoomEnvironment(), .05).texture;
+      // OBSIDIAN STUDIO 環境：漆黒＋ライトストリップ（宝飾撮影セットの反射）
+      const envScene = new THREE.Scene();
+      envScene.background = new THREE.Color(0x050508);
+      const strip = (w, h, hex, lum, x, y, z, ry, rx) => {
+        const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h),
+          new THREE.MeshBasicMaterial({ color: new THREE.Color(hex).multiplyScalar(lum) }));
+        m.position.set(x, y, z); m.rotation.set(rx || 0, ry || 0, 0);
+        envScene.add(m);
+      };
+      strip(7, 1.6, 0xfff1dd, 5.5, 0, 5, 0, 0, Math.PI / 2);
+      strip(1.4, 8, 0xeef2ff, 3.2, -6, 1, 0, Math.PI / 2, 0);
+      strip(1.6, 6, 0x9d8cff, 2.6, 6, 0, -1, -Math.PI / 2, 0);
+      strip(10, 10, 0x1a1a22, 1, 0, -4.2, 0, 0, -Math.PI / 2);
+      scene.environment = pmrem.fromScene(envScene, .06).texture;
 
       // 浮遊するガラスのデバイスと、周回するUIパネル
       const group = new THREE.Group();
@@ -822,6 +834,6 @@
     }), { threshold: .12 });
     document.querySelectorAll('.rv').forEach(el => io.observe(el));
   </script>
-  <script type="module" src="./assets/iaspira-motion.js?v=20260710b"></script>
+  <script type="module" src="./assets/iaspira-motion.js?v=20260711a"></script>
 </body>
 </html>
